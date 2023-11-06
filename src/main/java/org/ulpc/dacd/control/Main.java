@@ -1,5 +1,8 @@
 package org.ulpc.dacd.control;
-
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 public class Main {
     //Responsabilidades:
@@ -13,5 +16,7 @@ public class Main {
         OpenWeatherMapSupplier supplier = new OpenWeatherMapSupplier(apiUrl);
         supplier.fetchData();
 
+        SqliteWeatherStore sqliteWeatherStore = new SqliteWeatherStore();
+        sqliteWeatherStore.createTable("Lanzarote");
     }
 }

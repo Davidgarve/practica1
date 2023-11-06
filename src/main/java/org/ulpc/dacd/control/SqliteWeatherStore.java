@@ -6,24 +6,20 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class SqliteWeatherStore {
-    public static void main(String[] args) {
-        String dbPath = "example.db";
-        SqliteWeatherStore sqliteWeatherStore = new SqliteWeatherStore();
 
-        try (Connection connection = sqliteWeatherStore.connect(dbPath)) {
+    public void createTable(String tableName) {
+        try (Connection connection = connect("weather.db")) {
             Statement statement = connection.createStatement();
-            sqliteWeatherStore.createTable(statement);
+            String createTableSQL = "CREATE TABLE IF NOT EXISTS " + tableName + " (" +
+                    "id INTEGER PRIMARY KEY,\n" +
+                    "name TEXT NOT NULL,\n" +
+                    "price REAL DEFAULT 0" +
+                    ");";
+            statement.execute(createTableSQL);
+            System.out.println("Table '" + tableName + "' has been created.");
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    private void createTable(Statement statement) throws SQLException {
-        statement.execute("CREATE TABLE IF NOT EXISTS products (" +
-                "id INTEGER PRIMARY KEY,\n" +
-                "name TEXT NOT NULL,\n" +
-                "price REAL DEFAULT 0" +
-                ");");
     }
 
     public Connection connect(String dbPath) {
