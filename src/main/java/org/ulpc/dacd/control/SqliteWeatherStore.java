@@ -13,7 +13,9 @@ public class SqliteWeatherStore {
             String createTableSQL = "CREATE TABLE IF NOT EXISTS " + tableName + " (" +
                     "id INTEGER PRIMARY KEY,\n" +
                     "name TEXT NOT NULL,\n" +
-                    "price REAL DEFAULT 0" +
+                    "temperature REAL DEFAULT 0," +
+                    "wind_speed REAL DEFAULT 0," +
+                    "humidity INTEGER DEFAULT 0" +
                     ");";
             statement.execute(createTableSQL);
             System.out.println("Table '" + tableName + "' has been created.");
@@ -21,6 +23,8 @@ public class SqliteWeatherStore {
             throw new RuntimeException(e);
         }
     }
+
+
 
     public Connection connect(String dbPath) {
         Connection conn = null;
