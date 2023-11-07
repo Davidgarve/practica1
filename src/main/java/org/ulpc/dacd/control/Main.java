@@ -1,10 +1,7 @@
 package org.ulpc.dacd.control;
 import org.ulpc.dacd.model.Location;
+import org.ulpc.dacd.model.Weather;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.time.*;
 
 public class Main {
@@ -16,7 +13,8 @@ public class Main {
     //task()
     public static void main(String[] args) {
         OpenWeatherMapSupplier supplier = new OpenWeatherMapSupplier();
-        Location granCanaria = new Location(28.12144, -15.43979, "Las Palmas de Gran Canaria");
+        //Location granCanaria = new Location(28.12144, -15.43979, "Las Palmas de Gran Canaria");
+        Location arrecife = new Location(28.966271, -13.545968, "Arrecife");
 
         Instant actual = Instant.now();
         ZoneId husoHorarioCanarias = ZoneId.of("Atlantic/Canary");
@@ -24,9 +22,10 @@ public class Main {
         ZonedDateTime fechaHora12PM = fechaHoraLasPalmas.with(LocalTime.of(12, 0, 0));
         actual = fechaHora12PM.toInstant();
 
-        supplier.getWeather(granCanaria, actual);
+        Weather weatherLanzarote = supplier.getWeather(arrecife, actual);
+        System.out.println(weatherLanzarote);
 
-        SqliteWeatherStore sqliteWeatherStore = new SqliteWeatherStore();
-        sqliteWeatherStore.createTable("Lanzarote");
+        //SqliteWeatherStore sqliteWeatherStore = new SqliteWeatherStore();
+        //sqliteWeatherStore.createTable("Lanzarote");
     }
 }

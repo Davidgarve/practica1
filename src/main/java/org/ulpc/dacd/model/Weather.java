@@ -3,33 +3,51 @@ import java.time.Instant;
 
 public class Weather {
     private Instant ts;
-    private double rain;
-    private double windSpeed;
+    private double feels_like;
+    private double speed;
     private double temp;
     private int humidity;
     private Location location;
 
-    public Instant getTs() {
-        return ts;
+    public double getFeelsLike() {
+        return feels_like;
     }
 
-    public double getRain() {
-        return rain;
+    public void setFeelsLike(double feels_like) {
+        this.feels_like = feels_like;
     }
 
-    public double getWindSpeed() {
-        return windSpeed;
+    public double getSpeed() {
+        return speed;
+    }
+
+    public void setSpeed(double speed) {
+        this.speed = speed;
     }
 
     public double getTemp() {
         return temp;
     }
 
+    public void setTemp(double temp) {
+        this.temp = temp;
+    }
+
     public int getHumidity() {
         return humidity;
     }
 
-    public Location getLocation() {
-        return location;
+    public void setHumidity(int humidity) {
+        this.humidity = humidity;
+    }
+
+    @Override
+    public String toString() {
+        return "Weather{" +
+                "feels_like=" + feels_like +
+                ", speed=" + speed +
+                ", temp=" + temp +
+                ", humidity=" + humidity +
+                '}';
     }
 }
