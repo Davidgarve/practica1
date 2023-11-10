@@ -3,18 +3,20 @@ import java.time.Instant;
 
 public class Weather {
     private Instant ts;
-    private double feels_like;
+    private double pop;
     private double speed;
     private double temp;
     private int humidity;
     private Location location;
+    private String DtTxt;
+    private int CloudsAll;
 
-    public double getFeelsLike() {
-        return feels_like;
+    public double getPop() {
+        return pop;
     }
 
-    public void setFeelsLike(double feels_like) {
-        this.feels_like = feels_like;
+    public void setPop(double pop) {
+        this.pop = pop;
     }
 
     public double getSpeed() {
@@ -41,10 +43,26 @@ public class Weather {
         this.humidity = humidity;
     }
 
+    public String getDtTxt() {
+        return DtTxt;
+    }
+
+    public void setDtTxt(String dtTxt) {
+        DtTxt = dtTxt;
+    }
+
+    public int getCloudsAll() {
+        return CloudsAll;
+    }
+
+    public void setCloudsAll(int clouds) {
+        CloudsAll = clouds;
+    }
+
     @Override
     public String toString() {
         return "Weather{" +
-                "feels_like=" + feels_like +
+                "pop=" + pop +
                 ", speed=" + speed +
                 ", temp=" + temp +
                 ", humidity=" + humidity +

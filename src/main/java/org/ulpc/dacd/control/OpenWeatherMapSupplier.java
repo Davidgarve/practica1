@@ -1,10 +1,11 @@
 package org.ulpc.dacd.control;
-import org.ulpc.dacd.model.Location;
-import org.ulpc.dacd.model.Weather;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import org.ulpc.dacd.model.Location;
+import org.ulpc.dacd.model.Weather;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -12,14 +13,25 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.time.Instant;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 public class OpenWeatherMapSupplier {
 
-    public Weather getWeather(Location location, Instant ts) {
+    public List<Weather> getWeather(Location location, Instant ts) {
         try {
-            String apiUrl = "https://api.openweathermap.org/data/2.5/weather?lat=" + location.getLat() + "&lon=" + location.getLon() + "&appid=d41a06840247e2449a1ddc74dd6789da";
+            ZonedDateTime zonedDateTime = ts.atZone(ZoneId.of("Atlantic/Canary"));
+            ZonedDateTime date12PM = zonedDateTime.with(LocalTime.of(12, 0, 0));
+
+            String apiUrl = "https://api.openweathermap.org/data/2.5/forecast" +
+                    "?lat=" + location.getLat() +
+                    "&lon=" + location.getLon() +
+                    "&appid=d41a06840247e2449a1ddc74dd6789da";
+
             URL url = new URL(apiUrl);
-            System.out.println(apiUrl);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
 
@@ -36,9 +48,9 @@ public class OpenWeatherMapSupplier {
                 reader.close();
 
                 String responseData = response.toString();
-                Weather weather = parseWeatherData(responseData);
+                List<Weather> dailyWeatherForecast = parseDailyWeatherData(responseData, 5);
 
-                return weather; // Devuelve el objeto Weather
+                return dailyWeatherForecast;
             } else {
                 System.err.println("Error " + responseCode);
             }
@@ -50,31 +62,35 @@ public class OpenWeatherMapSupplier {
         return null;
     }
 
-    private Weather parseWeatherData(String responseData) {
-        // Parsear los datos JSON y filtrar solo los atributos necesarios
-        JsonParser jsonParser = new JsonParser();
-        JsonElement jsonElement = jsonParser.parse(responseData);
+    private List<Weather> parseDailyWeatherData(String responseData, int numDays) {
+        List<Weather> dailyWeatherForecast = new ArrayList<>();
+        JsonObject jsonObject = JsonParser.parseString(responseData).getAsJsonObject();
 
-        if (jsonElement.isJsonObject()) {
-            JsonObject jsonObject = jsonElement.getAsJsonObject();
+        if (jsonObject.has("list")) {
+            JsonArray dailyForecastList = jsonObject.getAsJsonArray("list");
 
-            // Filtra los atributos necesarios
-            double speed = jsonObject.getAsJsonObject("wind").get("speed").getAsDouble();
-            int humidity = jsonObject.getAsJsonObject("main").get("humidity").getAsInt();
-            double temp = jsonObject.getAsJsonObject("main").get("temp").getAsDouble();
-            double feelsLike = jsonObject.getAsJsonObject("main").get("feels_like").getAsDouble();
+            for (int i = 0; i < numDays; i++) {
+                JsonObject dailyData = dailyForecastList.get(i).getAsJsonObject();
 
+                String dtTxt = dailyData.get("dt_txt").getAsString();
+                int cloudsAll = dailyData.getAsJsonObject("clouds").get("all").getAsInt();
+                double pop = dailyData.get("pop").getAsDouble();
+                double temp = dailyData.getAsJsonObject("main").get("temp").getAsDouble();
+                int humidity = dailyData.getAsJsonObject("main").get("humidity").getAsInt();
+                double speed = dailyData.getAsJsonObject("wind").get("speed").getAsDouble();
 
-            // Crea el objeto Weather con los atributos filtrados
-            Weather weather = new Weather();
-            weather.setSpeed(speed);
-            weather.setHumidity(humidity);
-            weather.setTemp(temp);
-            weather.setFeelsLike(feelsLike);
+                Weather dailyWeather = new Weather();
+                dailyWeather.setDtTxt(dtTxt);
+                dailyWeather.setPop(pop);
+                dailyWeather.setTemp(temp);
+                dailyWeather.setHumidity(humidity);
+                dailyWeather.setSpeed(speed);
+                dailyWeather.setCloudsAll(cloudsAll);
 
-            return weather;
+                dailyWeatherForecast.add(dailyWeather);
+            }
         }
 
-        return null;
+        return dailyWeatherForecast;
     }
 }

@@ -1,9 +1,9 @@
 package org.ulpc.dacd.control;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
+import org.ulpc.dacd.model.Weather;
+
+import java.sql.*;
+import java.util.List;
 
 public class SqliteWeatherStore {
 
@@ -11,14 +11,33 @@ public class SqliteWeatherStore {
         try (Connection connection = connect("weather.db")) {
             Statement statement = connection.createStatement();
             String createTableSQL = "CREATE TABLE IF NOT EXISTS " + tableName + " (" +
-                    "id INTEGER PRIMARY KEY,\n" +
-                    "name TEXT NOT NULL,\n" +
+                    "dt_txt TEXT," +  // Agregamos dt_txt como una columna de texto
                     "temperature REAL DEFAULT 0," +
                     "wind_speed REAL DEFAULT 0," +
-                    "humidity INTEGER DEFAULT 0" +
+                    "humidity INTEGER DEFAULT 0," +
+                    "pop REAL DEFAULT 0," +
+                    "clouds_all INTEGER DEFAULT 0" +  // Agregamos all como una columna de enteros
                     ");";
             statement.execute(createTableSQL);
-            System.out.println("Table '" + tableName + "' has been created.");
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void insertWeather(String tableName, List<Weather> weatherList) {
+        try (Connection connection = connect("weather.db")) {
+            String insertSQL = "INSERT INTO " + tableName + " (dt_txt, temperature, wind_speed, humidity, pop, clouds_all) VALUES (?, ?, ?, ?, ?, ?)";
+            for (Weather weather : weatherList) {
+                try (PreparedStatement preparedStatement = connection.prepareStatement(insertSQL)) {
+                    preparedStatement.setString(1, weather.getDtTxt());
+                    preparedStatement.setDouble(2, weather.getTemp());
+                    preparedStatement.setDouble(3, weather.getSpeed());
+                    preparedStatement.setInt(4, weather.getHumidity());
+                    preparedStatement.setDouble(5, weather.getPop());
+                    preparedStatement.setInt(6, weather.getCloudsAll());
+                    preparedStatement.executeUpdate();
+                }
+            }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -31,7 +50,6 @@ public class SqliteWeatherStore {
         try {
             String url = "jdbc:sqlite:" + dbPath;
             conn = DriverManager.getConnection(url);
-            System.out.println("Connection to SQLite has been established.");
             return conn;
         } catch (SQLException e) {
             System.out.println(e.getMessage());
