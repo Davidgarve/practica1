@@ -1,7 +1,6 @@
 package org.ulpc.dacd.control;
 
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.ulpc.dacd.model.Location;
@@ -69,28 +68,35 @@ public class OpenWeatherMapSupplier {
         if (jsonObject.has("list")) {
             JsonArray dailyForecastList = jsonObject.getAsJsonArray("list");
 
-            for (int i = 0; i < numDays; i++) {
+            for (int i = 0; i < dailyForecastList.size(); i++) {
                 JsonObject dailyData = dailyForecastList.get(i).getAsJsonObject();
 
                 String dtTxt = dailyData.get("dt_txt").getAsString();
-                int cloudsAll = dailyData.getAsJsonObject("clouds").get("all").getAsInt();
-                double pop = dailyData.get("pop").getAsDouble();
-                double temp = dailyData.getAsJsonObject("main").get("temp").getAsDouble();
-                int humidity = dailyData.getAsJsonObject("main").get("humidity").getAsInt();
-                double speed = dailyData.getAsJsonObject("wind").get("speed").getAsDouble();
 
-                Weather dailyWeather = new Weather();
-                dailyWeather.setDtTxt(dtTxt);
-                dailyWeather.setPop(pop);
-                dailyWeather.setTemp(temp);
-                dailyWeather.setHumidity(humidity);
-                dailyWeather.setSpeed(speed);
-                dailyWeather.setCloudsAll(cloudsAll);
+                if (is12PM(dtTxt)) {
+                    int cloudsAll = dailyData.getAsJsonObject("clouds").get("all").getAsInt();
+                    double pop = dailyData.get("pop").getAsDouble();
+                    double temp = dailyData.getAsJsonObject("main").get("temp").getAsDouble();
+                    int humidity = dailyData.getAsJsonObject("main").get("humidity").getAsInt();
+                    double speed = dailyData.getAsJsonObject("wind").get("speed").getAsDouble();
 
-                dailyWeatherForecast.add(dailyWeather);
+                    Weather dailyWeather = new Weather();
+                    dailyWeather.setDtTxt(dtTxt);
+                    dailyWeather.setPop(pop);
+                    dailyWeather.setTemp(temp);
+                    dailyWeather.setHumidity(humidity);
+                    dailyWeather.setSpeed(speed);
+                    dailyWeather.setCloudsAll(cloudsAll);
+
+                    dailyWeatherForecast.add(dailyWeather);
+                }
             }
         }
 
         return dailyWeatherForecast;
+    }
+
+    private boolean is12PM(String dtTxt) {
+        return dtTxt.endsWith(" 12:00:00");
     }
 }
