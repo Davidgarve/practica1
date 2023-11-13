@@ -11,12 +11,12 @@ public class SqliteWeatherStore {
         try (Connection connection = connect("weather.db")) {
             Statement statement = connection.createStatement();
             String createTableSQL = "CREATE TABLE IF NOT EXISTS " + tableName + " (" +
-                    "dt_txt TEXT," +  // Agregamos dt_txt como una columna de texto
+                    "dt_txt TEXT UNIQUE," +
                     "temperature REAL DEFAULT 0," +
                     "wind_speed REAL DEFAULT 0," +
                     "humidity INTEGER DEFAULT 0," +
                     "pop REAL DEFAULT 0," +
-                    "clouds_all INTEGER DEFAULT 0" +  // Agregamos all como una columna de enteros
+                    "clouds_all INTEGER DEFAULT 0" +
                     ");";
             statement.execute(createTableSQL);
         } catch (SQLException e) {
@@ -24,9 +24,19 @@ public class SqliteWeatherStore {
         }
     }
 
+
     public void insertWeather(String tableName, List<Weather> weatherList) {
         try (Connection connection = connect("weather.db")) {
-            String insertSQL = "INSERT INTO " + tableName + " (dt_txt, temperature, wind_speed, humidity, pop, clouds_all) VALUES (?, ?, ?, ?, ?, ?)";
+            String insertSQL = "INSERT INTO " + tableName +
+                    " (dt_txt, temperature, wind_speed, humidity, pop, clouds_all) " +
+                    "VALUES (?, ?, ?, ?, ?, ?) " +
+                    "ON CONFLICT(dt_txt) DO UPDATE SET " +
+                    "temperature = EXCLUDED.temperature, " +
+                    "wind_speed = EXCLUDED.wind_speed, " +
+                    "humidity = EXCLUDED.humidity, " +
+                    "pop = EXCLUDED.pop, " +
+                    "clouds_all = EXCLUDED.clouds_all";
+
             for (Weather weather : weatherList) {
                 try (PreparedStatement preparedStatement = connection.prepareStatement(insertSQL)) {
                     preparedStatement.setString(1, weather.getDtTxt());
@@ -56,4 +66,6 @@ public class SqliteWeatherStore {
         }
         return conn;
     }
+
+
 }
