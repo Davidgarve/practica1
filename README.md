@@ -1,5 +1,15 @@
 # Weather Forecast Application
 
+- **Title:** Weather Forecast Application
+- **Subject:** Data science application development
+- **Course:** Second
+- **Academic Year:** 2023
+- **Degree:** Data Science Engineering Data
+- **School:** Computer engineering school (EII)
+- **University:** Las Palmas de Gran Canaria University (ULPGC)
+
+## Summary of Functionality
+
 This Java project is a simple weather forecast application that fetches weather data from the OpenWeatherMap API and stores it in a SQLite database every 6 hours. The application is designed to retrieve weather information for specified locations at regular intervals and store the data in a local SQLite database.
 
 ## Project Structure
