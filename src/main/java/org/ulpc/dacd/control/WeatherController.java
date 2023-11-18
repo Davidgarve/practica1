@@ -3,15 +3,15 @@ package org.ulpc.dacd.control;
 import org.ulpc.dacd.model.Location;
 import org.ulpc.dacd.model.Weather;
 
+
 import java.time.Instant;
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class WeatherController {
-    private OpenWeatherMapSupplier openWeatherMapSupplier;
-    private  SqliteWeatherStore sqliteWeatherStore;
+    private final OpenWeatherMapSupplier openWeatherMapSupplier;
+    private final SqliteWeatherStore sqliteWeatherStore;
 
     public WeatherController(OpenWeatherMapSupplier openWeatherMapSupplier, SqliteWeatherStore sqliteWeatherStore) {
         this.openWeatherMapSupplier = openWeatherMapSupplier;
@@ -19,8 +19,23 @@ public class WeatherController {
     }
 
     public void execute(Location... locations) {
-        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-        scheduler.scheduleAtFixedRate(() -> updateWeatherData(locations), 0, 6, TimeUnit.HOURS);
+        Timer timer = new Timer();
+        TimerTask task = new TimerTask() {
+            @Override
+            public void run() {
+                save(locations);
+            }
+        };
+
+        timer.scheduleAtFixedRate(task, 0, 6 * 60 * 60 * 1000);
+    }
+
+    public void save(Location... locations) {
+        for (Location location : locations) {
+            updateWeatherData(location);
+        }
+
+        System.out.println("Data updated and saved in the database.");
     }
 
     private void updateWeatherData(Location... locations) {
@@ -28,11 +43,11 @@ public class WeatherController {
             createTablesAndInsertData(location);
         }
 
-        System.out.println("Datos actualizados en la base de datos.");
+        System.out.println("Updated table in the database.");
     }
 
     private void createTablesAndInsertData(Location location) {
-        String tableName = location.getName().replace(" ", "_"); // Usa el nombre de la ubicación como nombre de la tabla
+        String tableName = location.getName().replace(" ", "_");
         List<Weather> weatherData = openWeatherMapSupplier.getWeather(location, Instant.now());
         sqliteWeatherStore.createTable(tableName);
         sqliteWeatherStore.insertWeather(tableName, weatherData);

@@ -1,15 +1,25 @@
 package org.ulpc.dacd.model;
+
 import java.time.Instant;
 
 public class Weather {
-    private Instant ts;
     private double pop;
     private double speed;
     private double temp;
     private int humidity;
+    private String date;
+    private int clouds;
+    private Instant ts;
     private Location location;
-    private String DtTxt;
-    private int CloudsAll;
+
+
+    public Location getLocation() {
+        return location;
+    }
+
+    public void setLocation(Location location) {
+        this.location = location;
+    }
 
     public double getPop() {
         return pop;
@@ -43,29 +53,40 @@ public class Weather {
         this.humidity = humidity;
     }
 
-    public String getDtTxt() {
-        return DtTxt;
+    public String getDate() {
+        return date;
     }
 
-    public void setDtTxt(String dtTxt) {
-        DtTxt = dtTxt;
+    public void setDate(String date) {
+        this.date = date;
     }
 
-    public int getCloudsAll() {
-        return CloudsAll;
+    public int getClouds() {
+        return clouds;
     }
 
-    public void setCloudsAll(int clouds) {
-        CloudsAll = clouds;
+    public void setClouds(int clouds) {
+        this.clouds = clouds;
+    }
+
+    public void setTs(Instant ts) {
+        this.ts = ts;
+    }
+    public Instant getTs() {
+        return ts;
     }
 
     @Override
     public String toString() {
         return "Weather{" +
-                "pop=" + pop +
-                ", speed=" + speed +
-                ", temp=" + temp +
-                ", humidity=" + humidity +
+                "pop=" + getPop() +
+                ", speed=" + getSpeed() +
+                ", temp=" + getTemp() +
+                ", humidity=" + getHumidity() +
+                ", date='" + getDate() + '\'' +
+                ", clouds=" + getClouds() +
+                ", ts=" + getTs() +
+                ", location=" + getLocation().toString() +
                 '}';
     }
 }

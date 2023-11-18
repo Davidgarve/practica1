@@ -12,9 +12,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.time.Instant;
-import java.time.LocalTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,13 +19,11 @@ public class OpenWeatherMapSupplier {
 
     public List<Weather> getWeather(Location location, Instant ts) {
         try {
-            ZonedDateTime zonedDateTime = ts.atZone(ZoneId.of("Atlantic/Canary"));
-            ZonedDateTime date12PM = zonedDateTime.with(LocalTime.of(12, 0, 0));
-
             String apiUrl = "https://api.openweathermap.org/data/2.5/forecast" +
                     "?lat=" + location.getLat() +
                     "&lon=" + location.getLon() +
-                    "&appid=d41a06840247e2449a1ddc74dd6789da";
+                    "&appid=d41a06840247e2449a1ddc74dd6789da" +
+                    "&units=metric";
 
             URL url = new URL(apiUrl);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -47,9 +42,8 @@ public class OpenWeatherMapSupplier {
                 reader.close();
 
                 String responseData = response.toString();
-                List<Weather> dailyWeatherForecast = parseDailyWeatherData(responseData, 5);
 
-                return dailyWeatherForecast;
+                return parseDailyWeatherData(responseData, ts, location);
             } else {
                 System.err.println("Error " + responseCode);
             }
@@ -61,7 +55,7 @@ public class OpenWeatherMapSupplier {
         return null;
     }
 
-    private List<Weather> parseDailyWeatherData(String responseData, int numDays) {
+    private List<Weather> parseDailyWeatherData(String responseData, Instant ts, Location location) {
         List<Weather> dailyWeatherForecast = new ArrayList<>();
         JsonObject jsonObject = JsonParser.parseString(responseData).getAsJsonObject();
 
@@ -71,9 +65,9 @@ public class OpenWeatherMapSupplier {
             for (int i = 0; i < dailyForecastList.size(); i++) {
                 JsonObject dailyData = dailyForecastList.get(i).getAsJsonObject();
 
-                String dtTxt = dailyData.get("dt_txt").getAsString();
+                String date = dailyData.get("dt_txt").getAsString();
 
-                if (is12PM(dtTxt)) {
+                if (is12PM(date)) {
                     int cloudsAll = dailyData.getAsJsonObject("clouds").get("all").getAsInt();
                     double pop = dailyData.get("pop").getAsDouble();
                     double temp = dailyData.getAsJsonObject("main").get("temp").getAsDouble();
@@ -81,13 +75,15 @@ public class OpenWeatherMapSupplier {
                     double speed = dailyData.getAsJsonObject("wind").get("speed").getAsDouble();
 
                     Weather dailyWeather = new Weather();
-                    dailyWeather.setDtTxt(dtTxt);
+                    dailyWeather.setDate(date);
                     dailyWeather.setPop(pop);
                     dailyWeather.setTemp(temp);
                     dailyWeather.setHumidity(humidity);
                     dailyWeather.setSpeed(speed);
-                    dailyWeather.setCloudsAll(cloudsAll);
-
+                    dailyWeather.setClouds(cloudsAll);
+                    dailyWeather.setTs(ts);
+                    dailyWeather.setLocation(location);
+                    System.out.println(dailyWeather);
                     dailyWeatherForecast.add(dailyWeather);
                 }
             }
@@ -96,7 +92,9 @@ public class OpenWeatherMapSupplier {
         return dailyWeatherForecast;
     }
 
-    private boolean is12PM(String dtTxt) {
-        return dtTxt.endsWith(" 12:00:00");
+
+
+    private boolean is12PM(String date) {
+        return date.endsWith(" 15:00:00");
     }
 }

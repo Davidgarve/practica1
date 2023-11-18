@@ -1,9 +1,9 @@
 package org.ulpc.dacd.model;
 
 public class Location {
-    private double lat;
-    private double lon;
-    private String name;
+    private final double lat;
+    private final double lon;
+    private final String name;
 
     public Location(double lat, double lon, String name) {
         this.lat = lat;
@@ -21,5 +21,14 @@ public class Location {
 
     public String getName() {
         return name;
+    }
+
+    @Override
+    public String toString() {
+        return "Location{" +
+                "lat=" + lat +
+                ", lon=" + lon +
+                ", name='" + name + '\'' +
+                '}';
     }
 }

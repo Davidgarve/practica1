@@ -1,17 +1,7 @@
 package org.ulpc.dacd.control;
 import org.ulpc.dacd.model.Location;
-import org.ulpc.dacd.model.Weather;
-
-import java.time.*;
-import java.util.List;
 
 public class Main {
-    //Responsabilidades:
-    //Crear controladores
-    //leer apiKey
-    //Cargar localizaciones
-    //Crear tarea perodica(cada 6 horas). EJECUTAR TAREA.
-    //task()
 
     public static void main(String[] args) {
         OpenWeatherMapSupplier supplier = new OpenWeatherMapSupplier();

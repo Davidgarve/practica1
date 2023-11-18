@@ -6,7 +6,5 @@ import org.ulpc.dacd.model.Weather;
 import java.time.Instant;
 
 public interface WeatherSupplier {
-
-    public Weather getWeather(Location location, Instant ts);
-
+     Weather getWeather(Location location, Instant ts);
 }
