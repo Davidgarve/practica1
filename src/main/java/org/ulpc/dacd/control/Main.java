@@ -4,7 +4,8 @@ import org.ulpc.dacd.model.Location;
 public class Main {
 
     public static void main(String[] args) {
-        OpenWeatherMapSupplier supplier = new OpenWeatherMapSupplier();
+        String apiKey = "d41a06840247e2449a1ddc74dd6789da";
+        OpenWeatherMapSupplier supplier = new OpenWeatherMapSupplier(apiKey);
         SqliteWeatherStore sqliteWeatherStore = new SqliteWeatherStore();
 
         Location caletaDeSebo = new Location(29.23036, -13.50536, "Caleta de Sebo");

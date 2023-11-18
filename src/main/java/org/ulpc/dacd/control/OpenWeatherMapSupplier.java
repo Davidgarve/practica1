@@ -16,14 +16,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class OpenWeatherMapSupplier {
+    private final String apiKey;
+
+    public OpenWeatherMapSupplier(String apiKey) {
+        this.apiKey = apiKey;
+    }
 
     public List<Weather> getWeather(Location location, Instant ts) {
         try {
             String apiUrl = "https://api.openweathermap.org/data/2.5/forecast" +
                     "?lat=" + location.getLat() +
                     "&lon=" + location.getLon() +
-                    "&appid=d41a06840247e2449a1ddc74dd6789da" +
-                    "&units=metric";
+                    "&appid=" + apiKey +
+                "&units=metric";
 
             URL url = new URL(apiUrl);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
