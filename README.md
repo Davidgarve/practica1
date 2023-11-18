@@ -1,5 +1,15 @@
 # Weather Forecast Application
 
+- **Title:** Weather Forecast Application
+- **Subject:** Data science application development
+- **Course:** Second
+- **Academic Year:** 2023
+- **Degree:** Data Science Engineering Data
+- **School:** Computer engineering school (EII)
+- **University:** Las Palmas de Gran Canaria University (ULPGC)
+
+## Summary of Functionality
+
 This Java project is a simple weather forecast application that fetches weather data from the OpenWeatherMap API and stores it in a SQLite database every 6 hours. The application is designed to retrieve weather information for specified locations at regular intervals and store the data in a local SQLite database.
 
 ## Project Structure
@@ -62,16 +72,35 @@ The `WeatherRepository` and `WeatherSupplier` interfaces define well-defined con
 4. Define the locations for which you want to retrieve weather data by creating `Location` objects and passing them to the `WeatherController` instance.
 5. Run the `Main` class to initiate the weather data retrieval process. The application will update the weather data for the specified locations every 6 hours.
 
-## Dependencies
+## Resources Used
 
-- [Gson](https://github.com/google/gson): A Java library for JSON serialization and deserialization.
-- [SQLite JDBC](https://github.com/xerial/sqlite-jdbc): SQLite JDBC driver for database connectivity.
-- Logback: A logging framework for Java applications.
+### Development Environment
+
+- **IDE:** [IntelliJ IDEA](https://www.jetbrains.com/idea/)
+
+### Version Control
+
+- **Git and GitHub:** [Git](https://git-scm.com/) for version control and [GitHub](https://github.com/) for hosting the repository.
+
+### Documentation Tools
+
+- **Markdown:** Used for creating the README.md file.
+
+### Build and Dependency Management
+
+- **Maven:** [Apache Maven](https://maven.apache.org/) for project build and dependency management.
+
+### Libraries
+
+- **Gson:** A Java library for JSON serialization and deserialization. [GitHub - Gson](https://github.com/google/gson)
+  
+- **SQLite JDBC:** SQLite JDBC driver for database connectivity. [GitHub - SQLite JDBC](https://github.com/xerial/sqlite-jdbc)
+
+- **Logback:** A logging framework for Java applications. [Logback](http://logback.qos.ch/)
+
 
 ## Notes
 
 - The application uses a simple SQLite database to store weather data. The database file is named `weather.db` and is created in the project directory.
 - The OpenWeatherMap API is queried for a 5-day weather forecast, and only data for 12:00 PM of each day is extracted and stored.
-- The project uses Java 8's `java.time` package for handling date and time.
 
-Feel free to customize the application based on your needs and integrate additional features or improvements.
