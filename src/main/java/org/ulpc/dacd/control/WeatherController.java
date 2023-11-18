@@ -23,33 +23,22 @@ public class WeatherController {
         TimerTask task = new TimerTask() {
             @Override
             public void run() {
-                save(locations);
+                updateAndSave(locations);
             }
         };
 
         timer.scheduleAtFixedRate(task, 0, 6 * 60 * 60 * 1000);
     }
 
-    public void save(Location... locations) {
+    public void updateAndSave(Location... locations) {
         for (Location location : locations) {
-            updateWeatherData(location);
+            String tableName = location.getName().replace(" ", "_");
+            List<Weather> weatherData = openWeatherMapSupplier.getWeather(location, Instant.now());
+            sqliteWeatherStore.createTable(tableName);
+            sqliteWeatherStore.insertWeather(tableName, weatherData);
+            System.out.println("Data updated and saved in the table.");
         }
 
         System.out.println("Data updated and saved in the database.");
-    }
-
-    private void updateWeatherData(Location... locations) {
-        for (Location location : locations) {
-            createTablesAndInsertData(location);
-        }
-
-        System.out.println("Updated table in the database.");
-    }
-
-    private void createTablesAndInsertData(Location location) {
-        String tableName = location.getName().replace(" ", "_");
-        List<Weather> weatherData = openWeatherMapSupplier.getWeather(location, Instant.now());
-        sqliteWeatherStore.createTable(tableName);
-        sqliteWeatherStore.insertWeather(tableName, weatherData);
     }
 }

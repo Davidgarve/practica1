@@ -6,9 +6,14 @@ import java.sql.*;
 import java.util.List;
 
 public class SqliteWeatherStore {
+    private final String dbPath;
+
+    public SqliteWeatherStore(String dbPath) {
+        this.dbPath = dbPath;
+    }
 
     public void createTable(String tableName) {
-        try (Connection connection = connect("weather.db")) {
+        try (Connection connection = connect()) {
             Statement statement = connection.createStatement();
             String createTableSQL = "CREATE TABLE IF NOT EXISTS " + tableName + " (" +
                     "date TEXT UNIQUE," +
@@ -25,7 +30,7 @@ public class SqliteWeatherStore {
     }
 
     public void insertWeather(String tableName, List<Weather> weatherList) {
-        try (Connection connection = connect("weather.db")) {
+        try (Connection connection = connect()) {
             String insertSQL = "INSERT INTO " + tableName +
                     " (date, temperature, windSpeed, humidity, pop, clouds) " +
                     "VALUES (?, ?, ?, ?, ?, ?) " +
@@ -52,7 +57,7 @@ public class SqliteWeatherStore {
         }
     }
 
-    public Connection connect(String dbPath) {
+    public Connection connect() {
         Connection conn = null;
         try {
             String url = "jdbc:sqlite:" + dbPath;

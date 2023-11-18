@@ -5,8 +5,9 @@ public class Main {
 
     public static void main(String[] args) {
         String apiKey = "d41a06840247e2449a1ddc74dd6789da";
+        String dbPath = "weather.db";
         OpenWeatherMapSupplier supplier = new OpenWeatherMapSupplier(apiKey);
-        SqliteWeatherStore sqliteWeatherStore = new SqliteWeatherStore();
+        SqliteWeatherStore sqliteWeatherStore = new SqliteWeatherStore(dbPath);
 
         Location caletaDeSebo = new Location(29.23036, -13.50536, "Caleta de Sebo");
         Location arrecife = new Location(28.966271, -13.545968, "Arrecife");
