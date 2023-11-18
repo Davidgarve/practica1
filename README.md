@@ -48,7 +48,7 @@ The project strictly adheres to fundamental design principles, fostering a robus
 
 ### Class Diagram
 
-![Ejemplo](https://github.com/Davidgarve/practica1/blob/uml.png)
+![Ejemplo](uml.jpg)
 
 ### Relationships and Dependencies
 
