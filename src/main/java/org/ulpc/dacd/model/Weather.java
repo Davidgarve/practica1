@@ -4,7 +4,7 @@ import java.time.Instant;
 
 public class Weather {
     private double pop;
-    private double speed;
+    private double windSpeed;
     private double temp;
     private int humidity;
     private String date;
@@ -29,12 +29,12 @@ public class Weather {
         this.pop = pop;
     }
 
-    public double getSpeed() {
-        return speed;
+    public double getWindSpeed() {
+        return windSpeed;
     }
 
-    public void setSpeed(double speed) {
-        this.speed = speed;
+    public void setWindSpeed(double windSpeed) {
+        this.windSpeed = windSpeed;
     }
 
     public double getTemp() {
@@ -80,8 +80,8 @@ public class Weather {
     public String toString() {
         return "Weather{" +
                 "pop=" + getPop() +
-                ", speed=" + getSpeed() +
-                ", temp=" + getTemp() +
+                ", windSpeed=" + getWindSpeed() +
+                ", temperature=" + getTemp() +
                 ", humidity=" + getHumidity() +
                 ", date='" + getDate() + '\'' +
                 ", clouds=" + getClouds() +

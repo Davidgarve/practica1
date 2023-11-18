@@ -84,7 +84,7 @@ public class OpenWeatherMapSupplier {
                     dailyWeather.setPop(pop);
                     dailyWeather.setTemp(temp);
                     dailyWeather.setHumidity(humidity);
-                    dailyWeather.setSpeed(speed);
+                    dailyWeather.setWindSpeed(speed);
                     dailyWeather.setClouds(cloudsAll);
                     dailyWeather.setTs(ts);
                     dailyWeather.setLocation(location);

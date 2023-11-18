@@ -40,7 +40,7 @@ public class SqliteWeatherStore {
                 try (PreparedStatement preparedStatement = connection.prepareStatement(insertSQL)) {
                     preparedStatement.setString(1, weather.getDate());
                     preparedStatement.setDouble(2, weather.getTemp());
-                    preparedStatement.setDouble(3, weather.getSpeed());
+                    preparedStatement.setDouble(3, weather.getWindSpeed());
                     preparedStatement.setInt(4, weather.getHumidity());
                     preparedStatement.setDouble(5, weather.getPop());
                     preparedStatement.setInt(6, weather.getClouds());
