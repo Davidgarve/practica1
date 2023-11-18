@@ -1,22 +1,25 @@
 # Weather Forecast Application
 
-This Java project is a simple weather forecast application that fetches weather data from the OpenWeatherMap API, stores it in a SQLite database, and provides a basic command-line interface for execution. The application is designed to retrieve weather information for specified locations at regular intervals and store the data in a local SQLite database.
+This Java project is a simple weather forecast application that fetches weather data from the OpenWeatherMap API and stores it in a SQLite database every 6 hours. The application is designed to retrieve weather information for specified locations at regular intervals and store the data in a local SQLite database.
 
 ## Project Structure
 
-The project is organized into several packages:
+The project is organized into distinct packages, each serving a specific purpose:
 
-- **org.ulpc.dacd.control**: Contains classes responsible for controlling the flow of the application.
-  - `Main`: The main class that initializes the necessary components and triggers the weather data update.
-  - `OpenWeatherMapSupplier`: Handles the communication with the OpenWeatherMap API and parses the received data.
-  - `SqliteWeatherStore`: Manages the SQLite database for storing weather data.
-  - `WeatherController`: Orchestrates the execution of tasks at regular intervals.
-  - `WeatherRepository`: Defines an interface for retrieving weather data.
-  - `WeatherSupplier`: Defines an interface for supplying weather data.
+org.ulpc.dacd.control
+This package is dedicated to classes responsible for controlling the flow of the application.
 
-- **org.ulpc.dacd.model**: Contains classes representing the data model of the application.
-  - `Location`: Represents a geographical location with latitude, longitude, and name.
-  - `Weather`: Represents weather data, including temperature, humidity, wind speed, etc.
+Main: The main class that serves as the entry point, initializing essential components, and triggering the weather data update.
+OpenWeatherMapSupplier: Manages communication with the OpenWeatherMap API, handling requests, and parsing the received data.
+SqliteWeatherStore: Responsible for managing the SQLite database, including storing weather data.
+WeatherController: Orchestrates the execution of tasks at regular intervals, ensuring the periodic update of weather data.
+WeatherRepository: Defines an interface for retrieving weather data, abstracting the data retrieval process.
+WeatherSupplier: Defines an interface for supplying weather data, allowing for different implementations.
+org.ulpc.dacd.model
+This package contains classes that represent the data model of the application.
+
+Location: Represents a geographical location, characterized by latitude, longitude, and a name.
+Weather: Represents weather data, encompassing information such as temperature, humidity, wind speed, etc.
 
 ## How to Use
 
