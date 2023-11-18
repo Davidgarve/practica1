@@ -95,6 +95,6 @@ public class OpenWeatherMapSupplier {
 
 
     private boolean is12PM(String date) {
-        return date.endsWith(" 15:00:00");
+        return date.endsWith(" 12:00:00");
     }
 }
