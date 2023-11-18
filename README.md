@@ -4,22 +4,28 @@ This Java project is a simple weather forecast application that fetches weather 
 
 ## Project Structure
 
-The project is organized into distinct packages, each serving a specific purpose:
+The project's architecture is thoughtfully organized into well-defined packages, each serving a specific purpose:
 
-org.ulpc.dacd.control
-This package is dedicated to classes responsible for controlling the flow of the application.
+### `org.ulpc.dacd.control`
 
-Main: The main class that serves as the entry point, initializing essential components, and triggering the weather data update.
-OpenWeatherMapSupplier: Manages communication with the OpenWeatherMap API, handling requests, and parsing the received data.
-SqliteWeatherStore: Responsible for managing the SQLite database, including storing weather data.
-WeatherController: Orchestrates the execution of tasks at regular intervals, ensuring the periodic update of weather data.
-WeatherRepository: Defines an interface for retrieving weather data, abstracting the data retrieval process.
-WeatherSupplier: Defines an interface for supplying weather data, allowing for different implementations.
-org.ulpc.dacd.model
-This package contains classes that represent the data model of the application.
+This package is dedicated to classes responsible for orchestrating the application's flow.
 
-Location: Represents a geographical location, characterized by latitude, longitude, and a name.
-Weather: Represents weather data, encompassing information such as temperature, humidity, wind speed, etc.
+- **`Main`**: The main class serves as the entry point, initializing essential components and triggering the weather data update.
+- **`OpenWeatherMapSupplier`**: Manages communication with the OpenWeatherMap API, handling requests, and parsing the received data.
+- **`SqliteWeatherStore`**: Takes charge of managing the SQLite database, including the storage of weather data.
+- **`WeatherController`**: Orchestrates the execution of tasks at regular intervals, ensuring the periodic update of weather data.
+- **`WeatherRepository`**: Defines an interface for retrieving weather data, abstracting the data retrieval process.
+- **`WeatherSupplier`**: Defines an interface for supplying weather data, allowing for different implementations.
+
+### `org.ulpc.dacd.model`
+
+This package encapsulates classes that vividly represent the data model of the application.
+
+- **`Location`**: A representation of a geographical location, characterized by latitude, longitude, and a distinctive name.
+- **`Weather`**: An embodiment of weather data, encompassing information such as temperature, humidity, wind speed, and more.
+
+This meticulously structured organization enhances code readability, maintainability, and scalability by grouping related functionalities into coherent packages. The clear separation between control and model packages adheres to the principles of modularity and separation of concerns, fostering a clean and comprehensible codebase.
+
 
 ## How to Use
 
