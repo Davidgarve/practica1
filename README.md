@@ -24,7 +24,34 @@ This package encapsulates classes that vividly represent the data model of the a
 - **`Location`**: A representation of a geographical location, characterized by latitude, longitude, and a distinctive name.
 - **`Weather`**: An embodiment of weather data, encompassing information such as temperature, humidity, wind speed, and more.
 
-This meticulously structured organization enhances code readability, maintainability, and scalability by grouping related functionalities into coherent packages. The clear separation between control and model packages adheres to the principles of modularity and separation of concerns, fostering a clean and comprehensible codebase.
+## Design
+
+### Design Principles and Patterns
+
+The project strictly adheres to fundamental design principles, fostering a robust and maintainable codebase through the following practices:
+
+- **Modularity:** The use of packages (`org.ulpc.dacd.control` and `org.ulpc.dacd.model`) ensures a modular structure, enhancing code organization and readability.
+  
+- **Separation of Concerns:** Clear segregation between control and model components allows for focused development, making it easier to understand, maintain, and extend specific functionalities.
+
+- **Code Readability:** Emphasis on clean and readable code contributes to a more comprehensible and maintainable project.
+
+### Class Diagram
+
+[Include a link or image of your class diagram here.]
+
+### Relationships and Dependencies
+
+Within the `control` package, classes collaborate seamlessly to orchestrate the application's flow:
+
+- **WeatherController:** Orchestrates tasks, relying on the collaboration of `OpenWeatherMapSupplier` and `SqliteWeatherStore` to fetch and store weather data periodically.
+
+- **OpenWeatherMapSupplier:** Manages communication with the OpenWeatherMap API, ensuring accurate data retrieval.
+
+- **SqliteWeatherStore:** Takes responsibility for managing the SQLite database, storing and updating weather data efficiently.
+
+The `WeatherRepository` and `WeatherSupplier` interfaces define well-defined contracts, establishing clear guidelines for data retrieval and supply. This separation of concerns facilitates flexibility and scalability.
+
 
 
 ## How to Use
