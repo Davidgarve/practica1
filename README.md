@@ -48,7 +48,7 @@ The project strictly adheres to fundamental design principles, fostering a robus
 
 ### Class Diagram
 
-[Include a link or image of your class diagram here.]
+![Ejemplo](uml.jpg)
 
 ### Relationships and Dependencies
 
@@ -101,6 +101,6 @@ The `WeatherRepository` and `WeatherSupplier` interfaces define well-defined con
 
 ## Notes
 
-- The application uses a simple SQLite database to store weather data. The database file is named `weather.db` and is created in the project directory.
+- The application uses a local SQLite database to store weather data. You can change the database name in main class.
 - The OpenWeatherMap API is queried for a 5-day weather forecast, and only data for 12:00 PM of each day is extracted and stored.
 
