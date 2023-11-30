@@ -11,6 +11,8 @@ public class Weather {
     private int clouds;
     private Instant ts;
     private Location location;
+    private String ss;
+    private Instant predictionTs;
 
 
     public Location getLocation() {

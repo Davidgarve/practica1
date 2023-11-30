@@ -20,7 +20,7 @@ The project's architecture is thoughtfully organized into well-defined packages,
 
 This package is dedicated to classes responsible for orchestrating the application's flow.
 
-- **`Main`**: The main class serves as the entry point, initializing essential components and triggering the weather data update.
+- **`org.ulpgc.dacd.control.Main`**: The main class serves as the entry point, initializing essential components and triggering the weather data update.
 - **`OpenWeatherMapSupplier`**: Manages communication with the OpenWeatherMap API, handling requests, and parsing the received data.
 - **`SqliteWeatherStore`**: Takes charge of managing the SQLite database, including the storage of weather data.
 - **`WeatherController`**: Orchestrates the execution of tasks at regular intervals, ensuring the periodic update of weather data.
@@ -66,11 +66,11 @@ The `WeatherRepository` and `WeatherSupplier` interfaces define well-defined con
 
 ## How to Use
 
-1. Open the `Main` class in the `org.ulpc.dacd.control` package.
+1. Open the `org.ulpgc.dacd.control.Main` class in the `org.ulpc.dacd.control` package.
 2. Ensure you have the necessary API key for OpenWeatherMap. You can obtain it [here](https://openweathermap.org/appid).
-3. Replace the placeholder API key in the `Main` class with your actual API key.
+3. Replace the placeholder API key in the `org.ulpgc.dacd.control.Main` class with your actual API key.
 4. Define the locations for which you want to retrieve weather data by creating `Location` objects and passing them to the `WeatherController` instance.
-5. Run the `Main` class to initiate the weather data retrieval process. The application will update the weather data for the specified locations every 6 hours.
+5. Run the `org.ulpgc.dacd.control.Main` class to initiate the weather data retrieval process. The application will update the weather data for the specified locations every 6 hours.
 
 ## Resources Used
 

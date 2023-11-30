@@ -5,9 +5,7 @@ public class Main {
 
     public static void main(String[] args) {
         String apiKey = "d41a06840247e2449a1ddc74dd6789da";
-        String dbPath = "weather.db";
         OpenWeatherMapSupplier supplier = new OpenWeatherMapSupplier(apiKey);
-        SqliteWeatherStore sqliteWeatherStore = new SqliteWeatherStore(dbPath);
 
         Location caletaDeSebo = new Location(29.23036, -13.50536, "Caleta de Sebo");
         Location arrecife = new Location(28.966271, -13.545968, "Arrecife");
@@ -18,7 +16,7 @@ public class Main {
         Location santaCruzLaPalma = new Location(28.68369, -17.76615, "Santa Cruz de la Palma");
         Location valverde = new Location(27.808402, -17.915343, "Valverde");
 
-        WeatherController weatherController = new WeatherController(supplier, sqliteWeatherStore);
-        weatherController.execute(caletaDeSebo, arrecife, puertoDelRosario, lasPalmas, santaCruzTenerife, sanSebastian, santaCruzLaPalma, valverde);
+        //WeatherController weatherController = new WeatherController(supplier, sqliteWeatherStore);
+        //weatherController.execute(caletaDeSebo, arrecife, puertoDelRosario, lasPalmas, santaCruzTenerife, sanSebastian, santaCruzLaPalma, valverde);
     }
 }
