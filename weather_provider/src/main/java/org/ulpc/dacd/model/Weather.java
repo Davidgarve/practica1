@@ -7,12 +7,10 @@ public class Weather {
     private double windSpeed;
     private double temp;
     private int humidity;
-    private String date;
+    private String predictionDate;
     private int clouds;
     private Instant ts;
     private Location location;
-    private String ss;
-    private Instant predictionTs;
 
 
     public Location getLocation() {
@@ -55,12 +53,12 @@ public class Weather {
         this.humidity = humidity;
     }
 
-    public String getDate() {
-        return date;
+    public String getPredictionDate() {
+        return predictionDate;
     }
 
-    public void setDate(String date) {
-        this.date = date;
+    public void setPredictionDate(String predictionDate) {
+        this.predictionDate = predictionDate;
     }
 
     public int getClouds() {
@@ -85,7 +83,7 @@ public class Weather {
                 ", windSpeed=" + getWindSpeed() +
                 ", temperature=" + getTemp() +
                 ", humidity=" + getHumidity() +
-                ", date='" + getDate() + '\'' +
+                ", predictionDate='" + getPredictionDate() + '\'' +
                 ", clouds=" + getClouds() +
                 ", ts=" + getTs() +
                 ", location=" + getLocation().toString() +

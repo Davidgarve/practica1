@@ -19,9 +19,6 @@ public class Location {
         return lon;
     }
 
-    public String getName() {
-        return name;
-    }
 
     @Override
     public String toString() {

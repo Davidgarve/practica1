@@ -12,6 +12,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,7 +30,7 @@ public class OpenWeatherMapSupplier {
                     "?lat=" + location.getLat() +
                     "&lon=" + location.getLon() +
                     "&appid=" + apiKey +
-                "&units=metric";
+                    "&units=metric";
 
             URL url = new URL(apiUrl);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -79,15 +81,7 @@ public class OpenWeatherMapSupplier {
                     int humidity = dailyData.getAsJsonObject("main").get("humidity").getAsInt();
                     double speed = dailyData.getAsJsonObject("wind").get("speed").getAsDouble();
 
-                    Weather dailyWeather = new Weather();
-                    dailyWeather.setDate(date);
-                    dailyWeather.setPop(pop);
-                    dailyWeather.setTemp(temp);
-                    dailyWeather.setHumidity(humidity);
-                    dailyWeather.setWindSpeed(speed);
-                    dailyWeather.setClouds(cloudsAll);
-                    dailyWeather.setTs(ts);
-                    dailyWeather.setLocation(location);
+                    Weather dailyWeather = createWeatherObject(date, pop, temp, humidity, speed, cloudsAll, ts, location);
                     System.out.println(dailyWeather);
                     dailyWeatherForecast.add(dailyWeather);
                 }
@@ -97,9 +91,21 @@ public class OpenWeatherMapSupplier {
         return dailyWeatherForecast;
     }
 
-
-
     private boolean is12PM(String date) {
-        return date.endsWith(" 12:00:00");
+        LocalDateTime dateTime = LocalDateTime.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        return dateTime.getHour() == 12 && dateTime.getMinute() == 0 && dateTime.getSecond() == 0;
+    }
+
+    private Weather createWeatherObject(String predictionDate, double pop, double temp, int humidity, double speed, int cloudsAll, Instant ts, Location location) {
+        Weather weather = new Weather();
+        weather.setPredictionDate(predictionDate);
+        weather.setPop(pop);
+        weather.setTemp(temp);
+        weather.setHumidity(humidity);
+        weather.setWindSpeed(speed);
+        weather.setClouds(cloudsAll);
+        weather.setTs(ts);
+        weather.setLocation(location);
+        return weather;
     }
 }

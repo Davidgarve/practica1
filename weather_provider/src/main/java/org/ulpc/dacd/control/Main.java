@@ -1,5 +1,9 @@
 package org.ulpc.dacd.control;
 import org.ulpc.dacd.model.Location;
+import org.ulpc.dacd.model.Weather;
+
+import java.time.Instant;
+import java.util.List;
 
 public class Main {
 
@@ -16,7 +20,17 @@ public class Main {
         Location santaCruzLaPalma = new Location(28.68369, -17.76615, "Santa Cruz de la Palma");
         Location valverde = new Location(27.808402, -17.915343, "Valverde");
 
-        //WeatherController weatherController = new WeatherController(supplier, sqliteWeatherStore);
-        //weatherController.execute(caletaDeSebo, arrecife, puertoDelRosario, lasPalmas, santaCruzTenerife, sanSebastian, santaCruzLaPalma, valverde);
+        // Configurar la conexión con ActiveMQ
+        String brokerURL = "tcp://localhost:61616"; // Ajusta según tu configuración
+        String queueName = "prediction.weather"; // Ajusta el nombre de la cola
+
+        // Crear instancias de WeatherController y JmsWeatherStore
+        WeatherController weatherController = new WeatherController(supplier, new JmsWeatherStore());
+
+        // Ejecutar el método execute con la ubicación de Arrecife
+        weatherController.execute(arrecife);
+
     }
+
+
 }
