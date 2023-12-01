@@ -97,15 +97,6 @@ public class OpenWeatherMapSupplier {
     }
 
     private Weather createWeatherObject(String predictionDate, double pop, double temp, int humidity, double speed, int cloudsAll, Instant ts, Location location) {
-        Weather weather = new Weather();
-        weather.setPredictionDate(predictionDate);
-        weather.setPop(pop);
-        weather.setTemp(temp);
-        weather.setHumidity(humidity);
-        weather.setWindSpeed(speed);
-        weather.setClouds(cloudsAll);
-        weather.setTs(ts);
-        weather.setLocation(location);
-        return weather;
+        return new Weather(pop, speed, temp, humidity, predictionDate, cloudsAll, ts, location);
     }
 }
