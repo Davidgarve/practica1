@@ -11,10 +11,14 @@ import java.util.TimerTask;
 public class WeatherController {
     private final OpenWeatherMapSupplier openWeatherMapSupplier;
     private final JmsWeatherStore jmsWeatherStore;
+    private final String brokerURL;
+    private final String topicName;
 
-    public WeatherController(OpenWeatherMapSupplier openWeatherMapSupplier, JmsWeatherStore jmsWeatherStore) {
+    public WeatherController(OpenWeatherMapSupplier openWeatherMapSupplier, JmsWeatherStore jmsWeatherStore, String brokerURL, String topicName) {
         this.openWeatherMapSupplier = openWeatherMapSupplier;
         this.jmsWeatherStore = jmsWeatherStore;
+        this.brokerURL = brokerURL;
+        this.topicName = topicName;
     }
 
     public void execute(Location... locations) {
@@ -23,18 +27,13 @@ public class WeatherController {
             @Override
             public void run() {
                 for (Location location : locations) {
-                    // Obtener datos meteorológicos
                     List<Weather> weatherList = openWeatherMapSupplier.getWeather(location, Instant.now());
-
-                    // Enviar el clima al broker directamente para cada objeto Weather en la lista
                     for (Weather weather : weatherList) {
-                        jmsWeatherStore.sendWeatherToBroker(weather, "tcp://localhost:61616", "prediction.weather");
+                        jmsWeatherStore.sendWeatherToBroker(weather, brokerURL, topicName);
                     }
                 }
             }
         };
-
-        // Programar la ejecución cada seis horas (6 * 60 * 60 * 1000)
         timer.scheduleAtFixedRate(task, 0, 6 * 60 * 60 * 1000);
     }
 

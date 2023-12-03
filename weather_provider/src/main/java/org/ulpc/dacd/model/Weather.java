@@ -2,7 +2,7 @@ package org.ulpc.dacd.model;
 
 import java.time.Instant;
 
-public record Weather(double pop, double windSpeed, double temp, int humidity, String predictionDate, int clouds, Instant ts, Location location) {
+public record Weather(double pop, double windSpeed, double temp, int humidity, String predictionDate, String ss, int clouds, Instant ts, Location location) {
 
     @Override
     public String toString() {
@@ -14,6 +14,7 @@ public record Weather(double pop, double windSpeed, double temp, int humidity, S
                 ", predictionDate='" + predictionDate() + '\'' +
                 ", clouds=" + clouds() +
                 ", ts=" + ts() +
+                ", ss=" + ss() +
                 ", location=" + location().toString() +
                 '}';
     }

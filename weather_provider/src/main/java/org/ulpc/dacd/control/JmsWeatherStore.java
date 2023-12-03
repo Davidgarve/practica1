@@ -19,7 +19,7 @@ import java.time.Instant;
 public class JmsWeatherStore {
     private static final Gson gson = prepareGson();
 
-    public void sendWeatherToBroker(Weather weather, String brokerURL, String queueName) {
+    public void sendWeatherToBroker(Weather weather, String brokerURL, String topicName) {
         try {
             ConnectionFactory connectionFactory = new ActiveMQConnectionFactory(brokerURL);
             Connection connection = connectionFactory.createConnection();
@@ -28,13 +28,9 @@ public class JmsWeatherStore {
             // Crea una sesión sin transacciones y con envío automático de acuse de recibo
             Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 
-            // Crea la cola (si no existe)
-            // En un entorno de producción, la creación de la cola podría hacerse fuera de la aplicación
-            // y ser administrada por un administrador de colas
-            session.createQueue(queueName);
 
             // Crea un productor para la cola
-            MessageProducer producer = session.createProducer(session.createQueue(queueName));
+            MessageProducer producer = session.createProducer(session.createTopic(topicName));
 
             // Envía el mensaje con los datos del tiempo
             TextMessage message = session.createTextMessage(gson.toJson(weather));

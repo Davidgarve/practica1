@@ -20,16 +20,12 @@ public class Main {
         Location santaCruzLaPalma = new Location(28.68369, -17.76615, "Santa Cruz de la Palma");
         Location valverde = new Location(27.808402, -17.915343, "Valverde");
 
-        // Configurar la conexión con ActiveMQ
-        String brokerURL = "tcp://localhost:61616"; // Ajusta según tu configuración
-        String queueName = "prediction.weather"; // Ajusta el nombre de la cola
+        String brokerURL = "tcp://localhost:61616";
+        String topicName = "prediction.weather";
 
-        // Crear instancias de WeatherController y JmsWeatherStore
-        WeatherController weatherController = new WeatherController(supplier, new JmsWeatherStore());
-
-        // Ejecutar el método execute con la ubicación de Arrecife
-        weatherController.execute(arrecife);
-
+        JmsWeatherStore jmsWeatherStore = new JmsWeatherStore();
+        WeatherController weatherController = new WeatherController(supplier, jmsWeatherStore, brokerURL, topicName);
+        weatherController.execute(caletaDeSebo, arrecife, puertoDelRosario, lasPalmas, santaCruzTenerife, sanSebastian, santaCruzLaPalma, valverde);
     }
 
 

@@ -81,7 +81,7 @@ public class OpenWeatherMapSupplier {
                     int humidity = dailyData.getAsJsonObject("main").get("humidity").getAsInt();
                     double speed = dailyData.getAsJsonObject("wind").get("speed").getAsDouble();
 
-                    Weather dailyWeather = createWeatherObject(date, pop, temp, humidity, speed, cloudsAll, ts, location);
+                    Weather dailyWeather = createWeatherObject("OpenWeatherMap", date, pop, temp, humidity, speed,  cloudsAll, ts, location);
                     System.out.println(dailyWeather);
                     dailyWeatherForecast.add(dailyWeather);
                 }
@@ -96,7 +96,7 @@ public class OpenWeatherMapSupplier {
         return dateTime.getHour() == 12 && dateTime.getMinute() == 0 && dateTime.getSecond() == 0;
     }
 
-    private Weather createWeatherObject(String predictionDate, double pop, double temp, int humidity, double speed, int cloudsAll, Instant ts, Location location) {
-        return new Weather(pop, speed, temp, humidity, predictionDate, cloudsAll, ts, location);
+    private Weather createWeatherObject(String ss, String predictionDate, double pop, double temp, int humidity, double speed, int cloudsAll, Instant ts, Location location) {
+        return new Weather(pop, speed, temp, humidity, predictionDate, ss, cloudsAll, ts, location);
     }
 }
