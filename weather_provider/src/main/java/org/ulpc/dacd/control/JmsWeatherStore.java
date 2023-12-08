@@ -16,7 +16,7 @@ import javax.jms.TextMessage;
 import java.io.IOException;
 import java.time.Instant;
 
-public class JmsWeatherStore {
+public class JmsWeatherStore implements WeatherRepository{
     private static final Gson gson = prepareGson();
 
     public void sendWeatherToBroker(Weather weather, String brokerURL, String topicName) {
@@ -25,18 +25,11 @@ public class JmsWeatherStore {
             Connection connection = connectionFactory.createConnection();
             connection.start();
 
-            // Crea una sesión sin transacciones y con envío automático de acuse de recibo
             Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-
-
-            // Crea un productor para la cola
             MessageProducer producer = session.createProducer(session.createTopic(topicName));
-
-            // Envía el mensaje con los datos del tiempo
             TextMessage message = session.createTextMessage(gson.toJson(weather));
             producer.send(message);
 
-            // Cierra la conexión
             producer.close();
             session.close();
             connection.close();
@@ -46,12 +39,11 @@ public class JmsWeatherStore {
     }
 
     private static Gson prepareGson() {
-        return new GsonBuilder().setPrettyPrinting().registerTypeAdapter(Instant.class, new TypeAdapter<Instant>() {
+        return new GsonBuilder().registerTypeAdapter(Instant.class, new TypeAdapter<Instant>() {
             @Override
             public void write(JsonWriter out, Instant value) throws IOException {
                 out.value(value.toString());
             }
-
             @Override
             public Instant read(JsonReader in) throws IOException {
                 return Instant.parse(in.nextString());

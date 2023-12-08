@@ -17,7 +17,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class OpenWeatherMapSupplier {
+public class OpenWeatherMapSupplier implements WeatherSupplier{
     private final String apiKey;
 
     public OpenWeatherMapSupplier(String apiKey) {
@@ -50,7 +50,7 @@ public class OpenWeatherMapSupplier {
 
                 String responseData = response.toString();
 
-                return parseDailyWeatherData(responseData, ts, location);
+                return parseDailyWeather(responseData, ts, location);
             } else {
                 System.err.println("Error " + responseCode);
             }
@@ -62,7 +62,7 @@ public class OpenWeatherMapSupplier {
         return null;
     }
 
-    private List<Weather> parseDailyWeatherData(String responseData, Instant ts, Location location) {
+    private List<Weather> parseDailyWeather(String responseData, Instant ts, Location location) {
         List<Weather> dailyWeatherForecast = new ArrayList<>();
         JsonObject jsonObject = JsonParser.parseString(responseData).getAsJsonObject();
 

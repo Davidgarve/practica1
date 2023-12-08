@@ -1,14 +1,10 @@
 package org.ulpc.dacd.control;
 import org.ulpc.dacd.model.Location;
-import org.ulpc.dacd.model.Weather;
-
-import java.time.Instant;
-import java.util.List;
 
 public class Main {
 
     public static void main(String[] args) {
-        String apiKey = "d41a06840247e2449a1ddc74dd6789da";
+        String apiKey = args[0];
         OpenWeatherMapSupplier supplier = new OpenWeatherMapSupplier(apiKey);
 
         Location caletaDeSebo = new Location(29.23036, -13.50536, "Caleta de Sebo");
