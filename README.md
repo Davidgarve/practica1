@@ -46,7 +46,8 @@ The project strictly adheres to fundamental design principles, emphasizing modul
 - **Code Readability:** The project places a strong emphasis on clean and readable code, contributing to a more comprehensible and maintainable codebase.
 
 ### Class Diagram
-_(Include a class diagram image or link to it here.)_
+![Texto alternativo](weather_suplier.jpg)
+![Texto alternativo](weather_store.jpg)
 
 ### Relationships and Dependencies
 The relationship between the two modules is established through the message broker (ActiveMQ), allowing seamless communication and data flow.
