@@ -22,6 +22,7 @@ public class TopicSubscriber implements Subscriber {
             connection.start();
 
             EventStore eventStore = new EventStore();
+            System.out.println("Waiting for messages...");
             while (true) {
                 Message message = subscriber.receive();
                 if (message instanceof TextMessage) {
