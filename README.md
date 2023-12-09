@@ -11,6 +11,10 @@
 ## Summary of Functionality
 This Java project is a comprehensive weather forecast application that seamlessly integrates two modules: Weather Provider and Weather Store. The Weather Provider module fetches weather data from the OpenWeatherMap API, processes it, and sends it to a message broker (Apache ActiveMQ). On the other hand, the Weather Store module subscribes to these weather events, stores them locally, and provides a mechanism to access historical weather data. The application operates in a periodic manner, updating weather data for specified locations every 6 hours.
 
+## How to run .jar files
+1. First open a terminal and start the activemq execution.
+2. Then start the weather store execution in another terminal with this command: java -jar (address of the .jar).
+3. Finally, start the execution of the weather supplier in another terminal with this command: java -jar (address of the .jar).
 ## Project Structure
 The project's architecture is thoughtfully organized into well-defined packages, each serving a specific purpose:
 
