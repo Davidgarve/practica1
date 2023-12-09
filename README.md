@@ -89,17 +89,6 @@ The `WeatherRepository` and `WeatherSupplier` interfaces define well-defined con
 
 ## Resources used
 
-### Development Environment
-
-- **IDE:** IntelliJ IDEA
-
-### Version Control
-
-- **Git and GitHub:** Git for version control and GitHub for hosting the repository.
-
-### Build and Dependency Management
-
-- **Maven:** Apache Maven for project build and dependency management.
 ### Libraries
 
 - [Gson](https://github.com/google/gson): A Java library for JSON serialization and deserialization.
