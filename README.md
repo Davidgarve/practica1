@@ -53,18 +53,16 @@ The relationship between the two modules is established through the message brok
 
 ## How to Use
 1. Open the `Main` class in the `org.ulpc.dacd.control` package of the Weather Provider module.
-2. Ensure you have a valid API key for OpenWeatherMap. Obtain it [here](#). Replace the placeholder API key in the `Main` class with your actual API key.
+2. Ensure you have a valid API key for OpenWeatherMap. Obtain it [here](#).
 3. Define the locations for which you want to retrieve weather data by creating `Location` objects.
-4. Run the `Main` class to initiate the weather data retrieval process. The application will update the weather data for the specified locations every 6 hours.
-
-5. Open the `Main` class in the `org.ulpgc.dacd.control` package of the Weather Store module.
-6. Ensure that Apache ActiveMQ is running and configured with the `prediction.weather` topic.
-7. Run the `Main` class to initiate the message subscription process. The application will store weather events locally.
+4. Open the `Main` class in the `org.ulpgc.dacd.control` package of the Weather Store module.
+5. Ensure that Apache ActiveMQ is running and configured with the `prediction.weather` topic.
+6. Run the `Main` class to initiate the message subscription process. The application will store weather events locally.
+7. Run the `Main` class to initiate the weather data retrieval process. The application will update the weather data for the specified locations every 6 hours. When you run main you must enter the apikey as an argument.
 
 ## Resources Used
 ### Libraries
 - **Gson:** A Java library for JSON serialization and deserialization.
-- **SQLite JDBC:** SQLite JDBC driver for database connectivity.
 - **ActiveMQ:** Apache ActiveMQ for message subscription and handling.
 
 ## Acknowledgments
