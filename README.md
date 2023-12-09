@@ -14,7 +14,7 @@ This Java project is a comprehensive weather forecast application that seamlessl
 ## How to run .jar files
 1. First open a terminal and start the activemq execution.
 2. Then start the weather store execution in another terminal with this command: java -jar (address of the .jar).
-3. Finally, start the execution of the weather supplier in another terminal with this command: java -jar (address of the .jar).
+3. Finally, start the execution of the weather supplier in another terminal with this command: java -jar (address of the .jar) (your apiKey).
 ## Project Structure
 The project's architecture is thoughtfully organized into well-defined packages, each serving a specific purpose:
 
