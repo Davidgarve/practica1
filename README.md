@@ -16,91 +16,96 @@ This Java project is a simple weather forecast application that fetches weather 
 
 The project's architecture is thoughtfully organized into well-defined packages, each serving a specific purpose:
 
-### `org.ulpc.dacd.control`
+# Weather Provider Module
 
-This package is dedicated to classes responsible for orchestrating the application's flow.
+## Overview
 
-- **`org.ulpgc.dacd.control.Main`**: The main class serves as the entry point, initializing essential components and triggering the weather data update.
-- **`OpenWeatherMapSupplier`**: Manages communication with the OpenWeatherMap API, handling requests, and parsing the received data.
-- **`SqliteWeatherStore`**: Takes charge of managing the SQLite database, including the storage of weather data.
-- **`WeatherController`**: Orchestrates the execution of tasks at regular intervals, ensuring the periodic update of weather data.
-- **`WeatherRepository`**: Defines an interface for retrieving weather data, abstracting the data retrieval process.
-- **`WeatherSupplier`**: Defines an interface for supplying weather data, allowing for different implementations.
+The Weather Provider module is responsible for fetching weather data from the OpenWeatherMap API, processing it, and storing the relevant information in a message broker (Apache ActiveMQ). This module is designed to operate in a periodic manner, updating weather data for specified locations every 6 hours.
 
-### `org.ulpc.dacd.model`
+## Project Structure
 
-This package encapsulates classes that vividly represent the data model of the application.
+The module is organized into two packages:
 
-- **`Location`**: A representation of a geographical location, characterized by latitude, longitude, and a distinctive name.
-- **`Weather`**: An embodiment of weather data, encompassing information such as temperature, humidity, wind speed, and more.
+### Control Package (`org.ulpc.dacd.control`)
 
-## Design
+This package manages the orchestration of the application and handles external communications.
 
-### Design Principles and Patterns
+- **Main:** Entry point of the module. Initializes key components and triggers the weather data update.
+- **OpenWeatherMapSupplier:** Communicates with the OpenWeatherMap API, retrieves and parses weather data.
+- **JmsWeatherStore:** Connects to the message broker (ActiveMQ) and sends weather data.
+- **WeatherController:** Orchestrates the execution of tasks at regular intervals, ensuring the periodic update of weather data.
+- **WeatherRepository:** Defines an interface for sending weather data to the message broker.
+- **WeatherSupplier:** Interface for fetching weather data based on location and timestamp.
 
-The project strictly adheres to fundamental design principles, fostering a robust and maintainable codebase through the following practices:
+### Model Package (`org.ulpc.dacd.model`)
 
-- **Modularity:** The use of packages (`org.ulpc.dacd.control` and `org.ulpc.dacd.model`) ensures a modular structure, enhancing code organization and readability.
-  
-- **Separation of Concerns:** Clear segregation between control and model components allows for focused development, making it easier to understand, maintain, and extend specific functionalities.
+This package encapsulates classes representing the data model of the application.
 
-- **Code Readability:** Emphasis on clean and readable code contributes to a more comprehensible and maintainable project.
+- **Weather:** Represents weather data, including information such as precipitation probability, wind speed, temperature, humidity, and more.
+- **Location:** Represents a geographical location with latitude, longitude, and a name.
 
-### Class Diagram
+# Design
 
-![Ejemplo](uml.jpg)
+## Design Principles and Patterns
 
-### Relationships and Dependencies
+The Weather Provider module is built on fundamental design principles, emphasizing a robust and maintainable codebase. The following design practices are strictly adhered to:
+
+### Modularity
+
+The project is structured with modularity in mind, utilizing packages (`org.ulpc.dacd.control` and `org.ulpc.dacd.model`) to create a modular architecture. This enhances code organization, readability, and maintainability.
+
+### Separation of Concerns
+
+Clear separation between control and model components is a key design consideration. This approach allows for focused development, making it easier to understand, maintain, and extend specific functionalities.
+
+### Code Readability
+
+The project places a strong emphasis on clean and readable code. This practice contributes to a more comprehensible and maintainable codebase.
+
+## Class Diagram
+
+![Class Diagram](uml.png)
+
+## Relationships and Dependencies
 
 Within the `control` package, classes collaborate seamlessly to orchestrate the application's flow:
 
-- **WeatherController:** Orchestrates tasks, relying on the collaboration of `OpenWeatherMapSupplier` and `SqliteWeatherStore` to fetch and store weather data periodically.
+- **WeatherController:** Orchestrates tasks, relying on the collaboration of `OpenWeatherMapSupplier` and `JmsWeatherStore` to fetch and store weather data periodically.
 
 - **OpenWeatherMapSupplier:** Manages communication with the OpenWeatherMap API, ensuring accurate data retrieval.
 
-- **SqliteWeatherStore:** Takes responsibility for managing the SQLite database, storing and updating weather data efficiently.
+- **JmsWeatherStore:** Takes responsibility for connecting to the message broker (ActiveMQ) and sending weather data.
 
 The `WeatherRepository` and `WeatherSupplier` interfaces define well-defined contracts, establishing clear guidelines for data retrieval and supply. This separation of concerns facilitates flexibility and scalability.
 
-
-
 ## How to Use
 
-1. Open the `org.ulpgc.dacd.control.Main` class in the `org.ulpc.dacd.control` package.
-2. Ensure you have the necessary API key for OpenWeatherMap. You can obtain it [here](https://openweathermap.org/appid).
-3. Replace the placeholder API key in the `org.ulpgc.dacd.control.Main` class with your actual API key.
-4. Define the locations for which you want to retrieve weather data by creating `Location` objects and passing them to the `WeatherController` instance.
-5. Run the `org.ulpgc.dacd.control.Main` class to initiate the weather data retrieval process. The application will update the weather data for the specified locations every 6 hours.
+1. Open the `Main` class in the `org.ulpc.dacd.control` package.
+2. Ensure you have a valid API key for OpenWeatherMap. Obtain it [here](https://openweathermap.org/appid).
+3. Define the locations for which you want to retrieve weather data by creating `Location` objects.
+4. When you run the application you must specify what your apikey is in the terminal.
+5. Run the `Main` class to initiate the weather data retrieval process. The application will update the weather data for the specified locations every 6 hours.
 
-## Resources Used
 
-### Development Environment
+# Resources used
 
-- **IDE:** [IntelliJ IDEA](https://www.jetbrains.com/idea/)
+## Development Environment
 
-### Version Control
+- **IDE:** IntelliJ IDEA
 
-- **Git and GitHub:** [Git](https://git-scm.com/) for version control and [GitHub](https://github.com/) for hosting the repository.
+## Version Control
 
-### Documentation Tools
+- **Git and GitHub:** Git for version control and GitHub for hosting the repository.
 
-- **Markdown:** Used for creating the README.md file.
+## Build and Dependency Management
 
-### Build and Dependency Management
+- **Maven:** Apache Maven for project build and dependency management.
+## Libraries
 
-- **Maven:** [Apache Maven](https://maven.apache.org/) for project build and dependency management.
-
-### Libraries
-
-- **Gson:** A Java library for JSON serialization and deserialization. [GitHub - Gson](https://github.com/google/gson)
-  
-- **SQLite JDBC:** SQLite JDBC driver for database connectivity. [GitHub - SQLite JDBC](https://github.com/xerial/sqlite-jdbc)
-
-- **Logback:** A logging framework for Java applications. [Logback](http://logback.qos.ch/)
-
+- [Gson](https://github.com/google/gson): A Java library for JSON serialization and deserialization.
 
 ## Notes
 
-- The application uses a local SQLite database to store weather data. You can change the database name in main class.
+- You can modify the `brokerURL` and `topicName` variables in the `Main` class to configure the message broker connection, if you want.
 - The OpenWeatherMap API is queried for a 5-day weather forecast, and only data for 12:00 PM of each day is extracted and stored.
 
