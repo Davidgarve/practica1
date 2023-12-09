@@ -98,3 +98,56 @@ The `WeatherRepository` and `WeatherSupplier` interfaces define well-defined con
 - You can modify the `brokerURL` and `topicName` variables in the `Main` class to configure the message broker connection, if you want.
 - The OpenWeatherMap API is queried for a 5-day weather forecast, and only data for 12:00 PM of each day is extracted and stored.
 
+# Weather Store Module
+
+## Overview
+
+The Weather Store module is designed to subscribe to weather prediction messages from the prediction.weather topic, store these events locally, and provide a mechanism to access historical weather data. This module integrates with Apache ActiveMQ for message subscription.
+## Project Structure
+
+The module is organized into a control package:
+
+### Control Package (`org.ulpc.dacd.control`)
+
+This package manages the orchestration of the application and handles external communications.
+
+- **Main:** Entry point of the module. Initializes key components and triggers the weather data storage process.
+- **TopicSubscriber:** Subscribes to weather prediction messages from the prediction.weather topic and stores the events using the EventStore.
+- **EventStore:** Responsible for storing weather events locally.
+- **Subscriber:** Interface defining the contract for classes that subscribe to messages.
+- **EventStoreBuilder:** Interface defining the contract for classes that store weather events.
+
+## Design
+
+#### Design Principles and Patterns
+
+The Weather Store module adheres to fundamental design principles, promoting a robust and maintainable codebase. Key design practices include:
+
+#### Modularity
+
+The codebase is organized into packages, enhancing code organization and maintainability.
+
+#### Separation of Concerns
+
+Clear separation between control components allows for focused development, making it easier to understand and extend specific functionalities.
+
+#### Code Readability
+
+Emphasis on clean and readable code contributes to a more comprehensible and maintainable project.
+### Class Diagram
+
+![Class Diagram](uml.png)
+
+### Relationships and Dependencies
+
+Within the control package, classes collaborate seamlessly:
+
+- **TopicSubscriber:** Orchestrates message subscription, relying on the collaboration with EventStore to store weather events.
+
+- **EventStore:** Manages the storage of weather events locally.
+
+## How to Use
+
+1. Open the Main class in the org.ulpgc.dacd.control package.
+2. Ensure that Apache ActiveMQ is running and configured with the prediction.weather topic.
+3. Run the Main class to initiate the message subscription process. The application will store weather events locally.
