@@ -44,29 +44,29 @@ This package encapsulates classes representing the data model of the application
 - **Weather:** Represents weather data, including information such as precipitation probability, wind speed, temperature, humidity, and more.
 - **Location:** Represents a geographical location with latitude, longitude, and a name.
 
-# Design
+## Design
 
-## Design Principles and Patterns
+#### Design Principles and Patterns
 
 The Weather Provider module is built on fundamental design principles, emphasizing a robust and maintainable codebase. The following design practices are strictly adhered to:
 
-### Modularity
+#### Modularity
 
 The project is structured with modularity in mind, utilizing packages (`org.ulpc.dacd.control` and `org.ulpc.dacd.model`) to create a modular architecture. This enhances code organization, readability, and maintainability.
 
-### Separation of Concerns
+#### Separation of Concerns
 
 Clear separation between control and model components is a key design consideration. This approach allows for focused development, making it easier to understand, maintain, and extend specific functionalities.
 
-### Code Readability
+#### Code Readability
 
 The project places a strong emphasis on clean and readable code. This practice contributes to a more comprehensible and maintainable codebase.
 
-## Class Diagram
+### Class Diagram
 
 ![Class Diagram](uml.png)
 
-## Relationships and Dependencies
+### Relationships and Dependencies
 
 Within the `control` package, classes collaborate seamlessly to orchestrate the application's flow:
 
@@ -87,20 +87,20 @@ The `WeatherRepository` and `WeatherSupplier` interfaces define well-defined con
 5. Run the `Main` class to initiate the weather data retrieval process. The application will update the weather data for the specified locations every 6 hours.
 
 
-# Resources used
+## Resources used
 
-## Development Environment
+### Development Environment
 
 - **IDE:** IntelliJ IDEA
 
-## Version Control
+### Version Control
 
 - **Git and GitHub:** Git for version control and GitHub for hosting the repository.
 
-## Build and Dependency Management
+### Build and Dependency Management
 
 - **Maven:** Apache Maven for project build and dependency management.
-## Libraries
+### Libraries
 
 - [Gson](https://github.com/google/gson): A Java library for JSON serialization and deserialization.
 
