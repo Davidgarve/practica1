@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.Date;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 public class EventStore implements EventStoreBuilder {
     private static final String BASE_DIRECTORY = "eventstore";
@@ -14,12 +16,16 @@ public class EventStore implements EventStoreBuilder {
 
     public void storeEvent(String jsonWeather) {
         try {
+            JsonObject eventJson = JsonParser.parseString(jsonWeather).getAsJsonObject();
+            String ts = eventJson.getAsJsonPrimitive("ts").getAsString();
+            String ss = eventJson.getAsJsonPrimitive("ss").getAsString();
+
             String eventDirectoryName = BASE_DIRECTORY + File.separator +
                     EVENT_DIRECTORY_PREFIX + File.separator +
-                    "OpenWeatherMap";
+                    ss;
 
             String eventDirectoryPath = eventDirectoryName + File.separator;
-            String eventFilePath = eventDirectoryPath + formatDate(Instant.now()) + EVENT_FILE_EXTENSION;
+            String eventFilePath = eventDirectoryPath + formatDate(Instant.parse(ts)) + EVENT_FILE_EXTENSION;
             File directory = new File(eventDirectoryName);
             File eventFile = new File(eventFilePath);
 
