@@ -11,6 +11,7 @@
     <modules>
         <module>weather_provider</module>
         <module>weather_store</module>
+        <module>hotel_provider</module>
     </modules>
 
     <properties>
