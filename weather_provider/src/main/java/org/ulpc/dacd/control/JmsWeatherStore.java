@@ -16,7 +16,7 @@ import javax.jms.TextMessage;
 import java.io.IOException;
 import java.time.Instant;
 
-public class JmsWeatherStore implements WeatherRepository{
+public class JmsWeatherStore implements WeatherEventPublisher {
     private static final Gson gson = prepareGson();
 
     public void sendWeatherToBroker(Weather weather, String brokerURL, String topicName) {
