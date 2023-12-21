@@ -16,7 +16,7 @@ import javax.jms.TextMessage;
 import java.io.IOException;
 import java.time.Instant;
 
-public class JmsHotelStore {
+public class JmsHotelStore implements HotelEventPublisher{
     private static final Gson gson = prepareGson();
 
     public void sendHotelToBroker(Hotel hotel, String brokerURL, String topicName) {

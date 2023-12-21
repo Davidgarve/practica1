@@ -15,7 +15,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
-public class XoteloSupplier {
+public class XoteloSupplier implements HotelSupplier{
     private final String hotelKey;
 
     public XoteloSupplier(String apiKey) {
