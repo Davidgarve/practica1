@@ -10,22 +10,19 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 public class EventStore implements EventStoreBuilder {
-    private static final String BASE_DIRECTORY = "eventstore";
-    private static final String EVENT_DIRECTORY_PREFIX = "prediction.Weather";
+    private static final String BASE_DIRECTORY = "datalake" + File.separator + "eventstore";
     private static final String EVENT_FILE_EXTENSION = ".events";
 
-    public void storeEvent(String jsonWeather) {
+    public void storeEvent(String json, String topic) {
         try {
-            JsonObject eventJson = JsonParser.parseString(jsonWeather).getAsJsonObject();
+            JsonObject eventJson = JsonParser.parseString(json).getAsJsonObject();
             String ts = eventJson.getAsJsonPrimitive("ts").getAsString();
             String ss = eventJson.getAsJsonPrimitive("ss").getAsString();
 
-            String eventDirectoryName = BASE_DIRECTORY + File.separator +
-                    EVENT_DIRECTORY_PREFIX + File.separator +
-                    ss;
-
+            String eventDirectoryName = BASE_DIRECTORY + File.separator + topic + File.separator + ss;
             String eventDirectoryPath = eventDirectoryName + File.separator;
             String eventFilePath = eventDirectoryPath + formatDate(Instant.parse(ts)) + EVENT_FILE_EXTENSION;
+
             File directory = new File(eventDirectoryName);
             File eventFile = new File(eventFilePath);
 
@@ -41,8 +38,9 @@ public class EventStore implements EventStoreBuilder {
                 if (eventFile.length() > 0) {
                     writer.write("\n");
                 }
-                writer.write(jsonWeather);
+                writer.write(json);
             }
+
             System.out.println("Evento almacenado en: " + eventFilePath);
         } catch (IOException e) {
             e.printStackTrace();

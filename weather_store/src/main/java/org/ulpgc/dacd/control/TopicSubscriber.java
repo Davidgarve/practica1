@@ -8,8 +8,9 @@ public class TopicSubscriber implements Subscriber {
 
     public void start() {
         String brokerURL = "tcp://localhost:61616";
-        String topicName = "prediction.weather";
-        String subscriberId = "weather_store";
+        String ratesTopicName = "hotel.rates";
+        String weatherTopicName = "prediction.weather";
+        String subscriberId = "datalake_builder";
 
         try {
             ConnectionFactory connectionFactory = new ActiveMQConnectionFactory(brokerURL);
@@ -17,22 +18,55 @@ public class TopicSubscriber implements Subscriber {
             connection.setClientID(subscriberId);
 
             Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-            Topic topic = session.createTopic(topicName);
-            javax.jms.TopicSubscriber subscriber = session.createDurableSubscriber(topic, subscriberId);
+
+            Topic ratesTopic = session.createTopic(ratesTopicName);
+            javax.jms.TopicSubscriber ratesSubscriber = session.createDurableSubscriber(ratesTopic, subscriberId + "_rates");
+
+            Topic weatherTopic = session.createTopic(weatherTopicName);
+            javax.jms.TopicSubscriber weatherSubscriber = session.createDurableSubscriber(weatherTopic, subscriberId + "_weather");
+
             connection.start();
 
             EventStore eventStore = new EventStore();
             System.out.println("Waiting for messages...");
-            while (true) {
-                Message message = subscriber.receive();
-                if (message instanceof TextMessage) {
-                    TextMessage textMessage = (TextMessage) message;
-                    System.out.println("Received message: " + textMessage.getText());
-                    eventStore.storeEvent(textMessage.getText());
+
+            Thread ratesThread = new Thread(() -> {
+                try {
+                    while (true) {
+                        Message ratesMessage = ratesSubscriber.receive();
+                        processMessage(ratesMessage, eventStore, ratesTopicName);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-            }
+            });
+            ratesThread.start();
+
+            Thread weatherThread = new Thread(() -> {
+                try {
+                    while (true) {
+                        Message weatherMessage = weatherSubscriber.receive();
+                        processMessage(weatherMessage, eventStore, weatherTopicName);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
+            weatherThread.start();
+
+            ratesThread.join();
+            weatherThread.join();
+
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    private void processMessage(Message message, EventStore eventStore, String topic) throws JMSException {
+        if (message instanceof TextMessage) {
+            TextMessage textMessage = (TextMessage) message;
+            System.out.println("Received message: " + textMessage.getText());
+            eventStore.storeEvent(textMessage.getText(), topic);
         }
     }
 }
