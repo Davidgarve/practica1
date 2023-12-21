@@ -10,7 +10,7 @@
     <packaging>pom</packaging>
     <modules>
         <module>weather_provider</module>
-        <module>weather_store</module>
+        <module>datalake_builder</module>
         <module>hotel_provider</module>
     </modules>
 

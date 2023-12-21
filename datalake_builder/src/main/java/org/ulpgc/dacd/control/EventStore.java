@@ -10,7 +10,12 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 public class EventStore implements EventStoreBuilder {
-    private static final String BASE_DIRECTORY = "datalake" + File.separator + "eventstore";
+    private final String BASE_DIRECTORY;
+
+    public EventStore(String baseDirectory) {
+        this.BASE_DIRECTORY = baseDirectory;
+    }
+
     private static final String EVENT_FILE_EXTENSION = ".events";
 
     public void storeEvent(String json, String topic) {

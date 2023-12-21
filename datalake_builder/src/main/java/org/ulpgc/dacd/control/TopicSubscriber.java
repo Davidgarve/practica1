@@ -6,7 +6,7 @@ import javax.jms.*;
 
 public class TopicSubscriber implements Subscriber {
 
-    public void start() {
+    public void start(String baseDirectory) {
         String brokerURL = "tcp://localhost:61616";
         String ratesTopicName = "hotel.rates";
         String weatherTopicName = "prediction.weather";
@@ -27,7 +27,7 @@ public class TopicSubscriber implements Subscriber {
 
             connection.start();
 
-            EventStore eventStore = new EventStore();
+            EventStore eventStore = new EventStore(baseDirectory);
             System.out.println("Waiting for messages...");
 
             Thread ratesThread = new Thread(() -> {
