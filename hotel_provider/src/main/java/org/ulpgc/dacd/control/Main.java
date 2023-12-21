@@ -9,8 +9,8 @@ import java.time.Instant;
 public class Main {
 
     private static final String CONFIG_FILE = "hotels.txt";
-    private static final String CHECK_IN_DATE = "2023-12-21";
-    private static final String CHECK_OUT_DATE = "2023-12-26";
+    private static final String CHECK_IN_DATE = "2023-12-22";
+    private static final String CHECK_OUT_DATE = "2023-12-27";
     private static final String BROKER_URL = "tcp://localhost:61616";
     private static final String TOPIC_NAME = "hotel.rates";
 
