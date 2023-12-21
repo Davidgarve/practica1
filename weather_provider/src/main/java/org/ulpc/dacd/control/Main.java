@@ -14,7 +14,7 @@ public class Main {
         Location santaCruzTenerife = new Location(28.46140, -16.25852, "Tenerife");
         Location sanSebastian = new Location(28.09274, -17.11118, "La Gomera");
         Location santaCruzLaPalma = new Location(28.68369, -17.76615, "La Palma");
-        Location valverde = new Location(27.808402, -17.915343, "La Gomera");
+        Location valverde = new Location(27.808402, -17.915343, "El Hierro");
 
         String brokerURL = "tcp://localhost:61616";
         String topicName = "prediction.weather";
