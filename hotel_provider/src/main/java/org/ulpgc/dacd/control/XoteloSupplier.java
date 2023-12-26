@@ -12,10 +12,12 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class XoteloSupplier implements HotelSupplier{
+public class XoteloSupplier implements HotelSupplier {
     private final String hotelKey;
 
     public XoteloSupplier(String apiKey) {
@@ -24,20 +26,48 @@ public class XoteloSupplier implements HotelSupplier{
 
     public List<Hotel> getHotel(String hotelName, String checkInDate, String checkOutDate, String location, Instant ts) {
         try {
-            String ratesApiUrl = "https://data.xotelo.com/api/rates" +
-                    "?hotel_key=" + hotelKey +
-                    "&chk_in=" + checkInDate +
-                    "&chk_out=" + checkOutDate;
+            List<Hotel> hotelList = new ArrayList<>();
 
-            String ratesApiResponse = performApiCall(ratesApiUrl);
+            LocalDate[] checkInCheckOutDates = calculateCheckInCheckOutDates(checkInDate, checkOutDate);
+            LocalDate checkInLocalDate = checkInCheckOutDates[0];
+            LocalDate checkOutLocalDate = checkInCheckOutDates[1];
 
-            List<Hotel> hotel = parseXoteloApiResponse(ratesApiResponse, location, ts, hotelName);
+            LocalDate currentCheckIn = checkInLocalDate;
+            LocalDate currentCheckOut;
 
-            return hotel;
+            while (!checkInLocalDate.isAfter(checkOutLocalDate)) {
+                currentCheckOut = currentCheckIn.plusDays(1);
+
+                while (!currentCheckOut.isAfter(checkOutLocalDate)) {
+                    String ratesApiUrl = "https://data.xotelo.com/api/rates" +
+                            "?hotel_key=" + hotelKey +
+                            "&chk_in=" + currentCheckIn +
+                            "&chk_out=" + currentCheckOut;
+
+                    String ratesApiResponse = performApiCall(ratesApiUrl);
+
+                    List<Hotel> hotels = parseXoteloApiResponse(ratesApiResponse, location, ts, hotelName, currentCheckIn.toString(), currentCheckOut.toString());
+                    hotelList.addAll(hotels);
+
+                    currentCheckOut = currentCheckOut.plusDays(1);
+                }
+
+                currentCheckIn = currentCheckIn.plusDays(1);
+            }
+
+            return hotelList;
         } catch (IOException e) {
             e.printStackTrace();
         }
         return null;
+    }
+
+    private LocalDate[] calculateCheckInCheckOutDates(String checkIn, String checkOut) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate checkInLocalDate = LocalDate.parse(checkIn, formatter);
+        LocalDate checkOutLocalDate = LocalDate.parse(checkOut, formatter);
+
+        return new LocalDate[]{checkInLocalDate, checkOutLocalDate};
     }
 
     private String performApiCall(String apiUrl) throws IOException {
@@ -67,7 +97,7 @@ public class XoteloSupplier implements HotelSupplier{
         return null;
     }
 
-    private List<Hotel> parseXoteloApiResponse(String ratesApiResponse, String location, Instant ts, String hotelName) {
+    private List<Hotel> parseXoteloApiResponse(String ratesApiResponse, String location, Instant ts, String hotelName, String checkIn, String checkOut) {
         List<Hotel> hotelRates = new ArrayList<>();
         JsonObject ratesJsonObject = JsonParser.parseString(ratesApiResponse).getAsJsonObject();
 
@@ -87,7 +117,7 @@ public class XoteloSupplier implements HotelSupplier{
                 hotelRatesList.add(rateInfo);
             }
 
-            Hotel hotel = new Hotel(hotelName, location, "Xotelo", ts, hotelRatesList);
+            Hotel hotel = new Hotel(hotelName, location, ts, "Xotelo", checkIn, checkOut, hotelRatesList);
             System.out.println(hotel);
             hotelRates.add(hotel);
         }
