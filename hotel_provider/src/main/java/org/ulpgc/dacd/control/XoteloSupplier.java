@@ -35,7 +35,7 @@ public class XoteloSupplier implements HotelSupplier {
             LocalDate currentCheckIn = checkInLocalDate;
             LocalDate currentCheckOut;
 
-            while (!checkInLocalDate.isAfter(checkOutLocalDate)) {
+            while (!currentCheckIn.isAfter(checkOutLocalDate)) {
                 currentCheckOut = currentCheckIn.plusDays(1);
 
                 while (!currentCheckOut.isAfter(checkOutLocalDate)) {
