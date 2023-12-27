@@ -1,6 +1,5 @@
 package org.ulpgc.dacd.control;
 
-
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -10,40 +9,48 @@ import javax.jms.TextMessage;
 
 public class VacationVisionaryListener implements MessageListener {
 
-    private SQLiteEventStore eventStore;
-    private String messageType;
+    private final SQLiteEventStore eventStore;
+    private final String topic;
 
-    public VacationVisionaryListener(SQLiteEventStore eventStore, String messageType) {
+    public VacationVisionaryListener(SQLiteEventStore eventStore, String topic) {
         this.eventStore = eventStore;
-        this.messageType = messageType;
+        this.topic = topic;
     }
 
     @Override
     public void onMessage(Message message) {
         if (message instanceof TextMessage) {
+            TextMessage textMessage = (TextMessage) message;
+            String json;
             try {
-                String text = ((TextMessage) message).getText();
-                JsonObject jsonObject = JsonParser.parseString(text).getAsJsonObject();
-
-                // Utilizar el tipo de mensaje recibido
-                switch (messageType) {
-                    case "prediction.weather":
-                        eventStore.insertWeatherEvent(jsonObject);
-                        break;
-                    case "hotel.rates":
-                        //eventStore.insertHotelRateEvent(jsonObject);
-                        break;
-                    default:
-                        System.err.println("Tipo de evento desconocido: " + messageType);
-                        break;
-                }
-
+                json = textMessage.getText();
+                processMessage(json);
             } catch (Exception e) {
+                // Manejo de excepciones al procesar el mensaje
+                System.err.println("Error al procesar el mensaje: " + e.getMessage());
                 e.printStackTrace();
             }
-        } else {
-            System.err.println("Mensaje no es de tipo TextMessage");
+        }
+    }
+
+    private void processMessage(String json) {
+        try {
+            switch (topic) {
+                case "prediction.weather":
+                    eventStore.insertWeather(json);
+                    break;
+                case "hotel.rates":
+                        eventStore.insertHotelRates(json);
+                        eventStore.insertHotel(json);
+                        eventStore.insertCheckInOut(json);
+                    break;
+                default:
+                    System.out.println("Unhandled topic: " + topic);
+            }
+        } catch (Exception e) {
+            // Manejo de excepciones al procesar el mensaje
+            System.err.println("Error al procesar el mensaje: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 }
-
