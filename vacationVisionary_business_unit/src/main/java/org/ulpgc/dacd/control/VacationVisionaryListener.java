@@ -19,8 +19,7 @@ public class VacationVisionaryListener implements MessageListener {
 
     @Override
     public void onMessage(Message message) {
-        if (message instanceof TextMessage) {
-            TextMessage textMessage = (TextMessage) message;
+        if (message instanceof TextMessage textMessage) {
             String json;
             try {
                 json = textMessage.getText();
@@ -40,9 +39,9 @@ public class VacationVisionaryListener implements MessageListener {
                     eventStore.insertWeather(json);
                     break;
                 case "hotel.rates":
-                        eventStore.insertHotelRates(json);
-                        eventStore.insertHotel(json);
-                        eventStore.insertCheckInOut(json);
+                    SQLiteEventStore.insertHotel(json);
+                    SQLiteEventStore.insertCheckInOut(json);
+                    SQLiteEventStore.insertHotelRates(json);
                     break;
                 default:
                     System.out.println("Unhandled topic: " + topic);

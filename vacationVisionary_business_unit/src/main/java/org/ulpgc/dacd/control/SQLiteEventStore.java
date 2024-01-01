@@ -6,6 +6,11 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import java.sql.*;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class SQLiteEventStore {
     private static final String JDBC_URL = "jdbc:sqlite:datamark.db";
@@ -22,7 +27,6 @@ public class SQLiteEventStore {
         try (Connection connection = getConnection();
              Statement statement = connection.createStatement()) {
 
-            // Crear la tabla Hotel
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS Hotel (" +
                     "hotel_id INTEGER PRIMARY KEY AUTOINCREMENT," +
                     "hotel_name TEXT UNIQUE," +
@@ -31,7 +35,6 @@ public class SQLiteEventStore {
                     "ss TEXT" +
                     ");");
 
-            // Crear la tabla CheckInOut
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS CheckInOut (" +
                     "checkinout_id INTEGER PRIMARY KEY AUTOINCREMENT," +
                     "hotel_id INTEGER," +
@@ -41,7 +44,6 @@ public class SQLiteEventStore {
                     "FOREIGN KEY (hotel_id) REFERENCES Hotel(hotel_id)" +
                     ");");
 
-            // Crear la tabla HotelRates
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS HotelRates (" +
                     "hotelrates_id INTEGER PRIMARY KEY AUTOINCREMENT," +
                     "checkinout_id INTEGER," +
@@ -52,7 +54,6 @@ public class SQLiteEventStore {
                     "FOREIGN KEY (checkinout_id) REFERENCES CheckInOut(checkinout_id)" +
                     ");");
 
-            // Crear la tabla Weather
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS Weather (" +
                     "weather_id INTEGER PRIMARY KEY AUTOINCREMENT," +
                     "pop REAL," +
@@ -131,7 +132,7 @@ public class SQLiteEventStore {
                 statement.setDouble(3, rate);
                 statement.setDouble(4, tax);
 
-                statement.executeUpdate(); // Ejecutar la operación de inserción para cada tarifa
+                statement.executeUpdate();
             }
 
         } catch (SQLException e) {
@@ -140,27 +141,17 @@ public class SQLiteEventStore {
     }
 
 
-
-
-
-
-
-
-
     public void insertWeather(String weatherEvent) {
         try {
             Connection connection = getConnection();
 
-            // Convertir la cadena JSON a un objeto JsonObject
             JsonObject jsonObject = JsonParser.parseString(weatherEvent).getAsJsonObject();
 
-            // Preparar la declaración SQL para insertar o actualizar un evento meteorológico
             PreparedStatement preparedStatement = connection.prepareStatement(
                     "INSERT OR REPLACE INTO Weather (pop, wind_speed, temp, humidity, clouds, prediction_date, ss, ts, location_name) " +
                             "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
             );
 
-            // Establecer los parámetros en la declaración
             preparedStatement.setDouble(1, jsonObject.get("pop").getAsDouble());
             preparedStatement.setDouble(2, jsonObject.get("windSpeed").getAsDouble());
             preparedStatement.setDouble(3, jsonObject.get("temp").getAsDouble());
@@ -170,18 +161,12 @@ public class SQLiteEventStore {
             preparedStatement.setString(7, jsonObject.get("ss").getAsString());
             preparedStatement.setString(8, jsonObject.get("ts").getAsString());
 
-            // Obtener el objeto Location del JSON
             JsonObject locationJson = jsonObject.getAsJsonObject("location");
-            // Obtener la variable 'name' de Location
             String locationName = locationJson.get("name").getAsString();
 
-            // Establecer el nombre de la ubicación en la declaración
             preparedStatement.setString(9, locationName);
-
-            // Ejecutar la declaración
             preparedStatement.executeUpdate();
 
-            // Cerrar la conexión y el PreparedStatement
             preparedStatement.close();
             connection.close();
         } catch (SQLException e) {
@@ -215,7 +200,7 @@ public class SQLiteEventStore {
     }
 
     private static int getCheckInOutId(JsonObject jsonObject) {
-        int checkInOutId = -1; // Valor predeterminado si no se encuentra el checkinout
+        int checkInOutId = -1;
 
         try (Connection connection = getConnection();
              PreparedStatement statement = connection.prepareStatement(
@@ -239,4 +224,82 @@ public class SQLiteEventStore {
         return checkInOutId;
     }
 
+
+    public Map<String, Object> getWeatherInfo(String locationName, String predictionDate) {
+        Map<String, Object> weatherMap = new HashMap<>();
+
+        try (Connection connection = getConnection();
+             PreparedStatement statement = connection.prepareStatement(
+                     "SELECT * FROM Weather WHERE location_name = ? AND strftime('%Y-%m-%d', prediction_date) = ?")) {
+
+            statement.setString(1, locationName);
+            statement.setString(2, predictionDate);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    weatherMap.put("pop", resultSet.getDouble("pop"));
+                    weatherMap.put("windSpeed", resultSet.getDouble("wind_speed"));
+                    weatherMap.put("temp", resultSet.getDouble("temp"));
+                    weatherMap.put("humidity", resultSet.getInt("humidity"));
+                    weatherMap.put("clouds", resultSet.getInt("clouds"));
+                    weatherMap.put("predictionDate", resultSet.getString("prediction_date"));
+                    weatherMap.put("ss", resultSet.getString("ss"));
+                    weatherMap.put("ts", resultSet.getString("ts"));
+                    weatherMap.put("location_name", resultSet.getString("location_name"));
+
+                    return weatherMap;
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public List<String> getAvailableLocations() {
+        List<String> availableLocations = new ArrayList<>();
+
+        try (Connection connection = getConnection();
+             PreparedStatement statement = connection.prepareStatement(
+                     "SELECT DISTINCT location_name FROM Weather")) {
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    availableLocations.add(resultSet.getString("location_name"));
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return availableLocations;
+    }
+
+    public static List<String> getAvailableDatesInRange(LocalDate startDate, LocalDate endDate) {
+        List<String> availableDates = new ArrayList<>();
+
+        try (Connection connection = getConnection();
+             PreparedStatement statement = connection.prepareStatement(
+                     "SELECT DISTINCT strftime('%Y-%m-%d', prediction_date) AS date " +
+                             "FROM Weather " +
+                             "WHERE strftime('%Y-%m-%d', prediction_date) BETWEEN ? AND ?")) {
+
+            statement.setString(1, startDate.toString());
+            statement.setString(2, endDate.toString());
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    availableDates.add(resultSet.getString("date"));
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return availableDates;
+    }
 }
