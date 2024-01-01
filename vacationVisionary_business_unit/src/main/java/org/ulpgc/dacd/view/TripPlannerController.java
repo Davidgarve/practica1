@@ -5,17 +5,23 @@ import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
+import org.ulpgc.dacd.control.SQLiteEventStore;
 import org.ulpgc.dacd.control.TripPlanner;
+import org.ulpgc.dacd.control.TripPlannerHotel;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
-public class WeatherController {
+public class TripPlannerController {
 
     private final TripPlanner tripPlanner;
+    private final TripPlannerHotel tripPlannerHotel;
 
-    public WeatherController() {
-        this.tripPlanner = new TripPlanner();
+    public TripPlannerController(SQLiteEventStore eventStore) {
+        this.tripPlanner = new TripPlanner(eventStore);
+        this.tripPlannerHotel = new TripPlannerHotel(eventStore);
     }
 
     public VBox createPredictionTabContent() {
@@ -75,14 +81,40 @@ public class WeatherController {
         return recommendationContent;
     }
 
+    public VBox createHotelTabContent() {
+        VBox hotelContent = new VBox(10);
+        hotelContent.setPadding(new Insets(10));
+
+        ChoiceBox<String> hotelLocationChoiceBox = new ChoiceBox<>();
+        Button getHotelsButton = new Button("Obtener Hoteles Disponibles");
+        DatePicker checkInDatePicker = new DatePicker(LocalDate.now());
+        DatePicker checkOutDatePicker = new DatePicker(LocalDate.now().plusDays(1));
+        WebView hotelWebView = new WebView();
+        WebEngine hotelWebEngine = hotelWebView.getEngine();
+
+        updateAvailableLocations(hotelLocationChoiceBox);
+
+        getHotelsButton.setOnAction(e -> handleGetHotelsButtonClick(
+                hotelLocationChoiceBox.getValue(),
+                checkInDatePicker.getValue(),
+                checkOutDatePicker.getValue(),
+                hotelWebEngine
+        ));
+
+        hotelContent.getChildren().addAll(
+                new Label("Ubicación"), hotelLocationChoiceBox,
+                new Label("Fecha de Check-In"), checkInDatePicker,
+                new Label("Fecha de Check-Out"), checkOutDatePicker,
+                getHotelsButton, hotelWebView
+        );
+
+        return hotelContent;
+    }
+
     private void updateAvailableLocations(ChoiceBox<String> locationChoiceBox) {
-        try {
-            List<String> availableLocations = tripPlanner.getAvailableLocations();
-            locationChoiceBox.getItems().clear();
-            locationChoiceBox.getItems().addAll(availableLocations);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
+        List<String> availableLocations = tripPlannerHotel.getAvailableHotelLocations();
+        locationChoiceBox.getItems().clear();
+        locationChoiceBox.getItems().addAll(availableLocations);
     }
 
     private void handlePredictionButtonClick(String selectedLocation, LocalDate selectedDate, WebEngine webEngine) {
@@ -121,6 +153,25 @@ public class WeatherController {
         }
     }
 
+    private void handleGetHotelsButtonClick(String selectedLocation, LocalDate checkInDate, LocalDate checkOutDate, WebEngine webEngine) {
+        if (checkInDate == null || checkOutDate == null || checkInDate.isAfter(checkOutDate)) {
+            showAlert(Alert.AlertType.ERROR, "Error de fechas", "Selecciona fechas de check-in y check-out válidas.");
+            return;
+        }
+
+        webEngine.loadContent(""); // Limpiar contenido
+
+        try {
+            List<Map<String, Object>> hotelData = tripPlannerHotel.getHotelInfoForDates(selectedLocation, checkInDate, checkOutDate);
+            String htmlContent = TripPlannerHotel.buildHotelInfoHTML(hotelData);
+            webEngine.loadContent(htmlContent);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Error", "Se produjo un error al obtener la información de hoteles. Por favor, inténtalo de nuevo.");
+        }
+    }
+
+
 
     private void showAlert(Alert.AlertType alertType, String title, String content) {
         Alert alert = new Alert(alertType);
@@ -129,5 +180,4 @@ public class WeatherController {
         alert.setContentText(content);
         alert.showAndWait();
     }
-
 }

@@ -5,10 +5,11 @@ import java.util.*;
 
 public class TripPlanner {
 
+
     private final SQLiteEventStore eventStore;
 
-    public TripPlanner() {
-        this.eventStore = new SQLiteEventStore();
+    public TripPlanner(SQLiteEventStore eventStore) {
+        this.eventStore = eventStore;
     }
 
     public Map<String, Object> getWeatherInfo(String locationName, String predictionDate) {

@@ -1,8 +1,5 @@
 package org.ulpgc.dacd.control;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-
 import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.jms.TextMessage;
@@ -25,7 +22,6 @@ public class VacationVisionaryListener implements MessageListener {
                 json = textMessage.getText();
                 processMessage(json);
             } catch (Exception e) {
-                // Manejo de excepciones al procesar el mensaje
                 System.err.println("Error al procesar el mensaje: " + e.getMessage());
                 e.printStackTrace();
             }
@@ -47,7 +43,6 @@ public class VacationVisionaryListener implements MessageListener {
                     System.out.println("Unhandled topic: " + topic);
             }
         } catch (Exception e) {
-            // Manejo de excepciones al procesar el mensaje
             System.err.println("Error al procesar el mensaje: " + e.getMessage());
             e.printStackTrace();
         }

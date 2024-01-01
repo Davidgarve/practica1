@@ -15,7 +15,7 @@ import java.util.Map;
 public class SQLiteEventStore {
     private static final String JDBC_URL = "jdbc:sqlite:datamark.db";
 
-    private static Connection getConnection() {
+    static Connection getConnection() {
         try {
             return DriverManager.getConnection(JDBC_URL);
         } catch (SQLException e) {
@@ -302,4 +302,73 @@ public class SQLiteEventStore {
 
         return availableDates;
     }
+
+    public List<String> getAvailableHotelLocations() {
+        List<String> availableLocations = new ArrayList<>();
+
+        try (Connection connection = getConnection();
+             Statement statement = connection.createStatement()) {
+
+            String query = "SELECT DISTINCT location FROM Hotel";
+            ResultSet resultSet = statement.executeQuery(query);
+
+            while (resultSet.next()) {
+                availableLocations.add(resultSet.getString("location"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return availableLocations;
+    }
+
+    public List<Map<String, Object>> getHotelInfoForDates(String location, LocalDate checkInDate, LocalDate checkOutDate) {
+        List<Map<String, Object>> hotelInfoList = new ArrayList<>();
+
+        try (Connection connection = getConnection();
+             PreparedStatement statement = connection.prepareStatement(
+                     "SELECT Hotel.hotel_name, Hotel.location, Hotel.ts, Hotel.ss, CheckInOut.check_in, CheckInOut.check_out, CheckInOut.checkinout_id, HotelRates.name, HotelRates.rate, HotelRates.tax " +
+                             "FROM Hotel " +
+                             "JOIN CheckInOut ON Hotel.hotel_id = CheckInOut.hotel_id " +
+                             "JOIN HotelRates ON CheckInOut.checkinout_id = HotelRates.checkinout_id " +
+                             "WHERE Hotel.location = ? " +
+                             "AND CheckInOut.check_in = ? " +
+                             "AND CheckInOut.check_out = ?")) {
+
+            statement.setString(1, location);
+            statement.setString(2, checkInDate.toString());
+            statement.setString(3, checkOutDate.toString());
+
+            ResultSet resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
+                Map<String, Object> hotelInfo = new HashMap<>();
+                hotelInfo.put("hotelName", resultSet.getString("hotel_name"));
+                hotelInfo.put("location", resultSet.getString("location"));
+                hotelInfo.put("ts", resultSet.getString("ts"));
+                hotelInfo.put("ss", resultSet.getString("ss"));
+                hotelInfo.put("checkIn", resultSet.getString("check_in"));
+                hotelInfo.put("checkOut", resultSet.getString("check_out"));
+                hotelInfo.put("checkInOutId", resultSet.getInt("checkinout_id"));
+
+                List<Map<String, Object>> ratesList = new ArrayList<>();
+                do {
+                    Map<String, Object> rateInfo = new HashMap<>();
+                    rateInfo.put("name", resultSet.getString("name"));
+                    rateInfo.put("rate", resultSet.getDouble("rate"));
+                    rateInfo.put("tax", resultSet.getDouble("tax"));
+                    ratesList.add(rateInfo);
+                } while (resultSet.next() && resultSet.getString("hotel_name").equals(hotelInfo.get("hotelName")));
+
+                hotelInfo.put("rates", ratesList);
+                hotelInfoList.add(hotelInfo);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return hotelInfoList;
+    }
+
+
 }
