@@ -4,10 +4,10 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
-public class TripPlannerHotel {
+public class HotelBusinessLogic {
     private final SQLiteEventStore eventStore;
 
-    public TripPlannerHotel(SQLiteEventStore eventStore) {
+    public HotelBusinessLogic(SQLiteEventStore eventStore) {
         this.eventStore = eventStore;
     }
 

@@ -176,9 +176,8 @@ public class SQLiteEventStore {
 
 
 
-    // Métodos adicionales para obtener IDs necesarios
     private static int getHotelId(String hotelName) {
-        int hotelId = -1; // Valor predeterminado si no se encuentra el hotel
+        int hotelId = -1;
 
         try (Connection connection = getConnection();
              PreparedStatement statement = connection.prepareStatement(
@@ -258,24 +257,25 @@ public class SQLiteEventStore {
         return null;
     }
 
-    public List<String> getAvailableLocations() {
-        List<String> availableLocations = new ArrayList<>();
+    public List<String> getAvailableDates() {
+        List<String> availableDates = new ArrayList<>();
 
         try (Connection connection = getConnection();
-             PreparedStatement statement = connection.prepareStatement(
-                     "SELECT DISTINCT location_name FROM Weather")) {
+             PreparedStatement statement = connection.prepareStatement("SELECT DISTINCT prediction_date FROM Weather");
+             ResultSet resultSet = statement.executeQuery()) {
 
-            try (ResultSet resultSet = statement.executeQuery()) {
-                while (resultSet.next()) {
-                    availableLocations.add(resultSet.getString("location_name"));
-                }
+            while (resultSet.next()) {
+                String date = resultSet.getString("prediction_date");
+                date = date.split(" ")[0];
+
+                availableDates.add(date);
             }
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
-        return availableLocations;
+        return availableDates;
     }
 
     public static List<String> getAvailableDatesInRange(LocalDate startDate, LocalDate endDate) {
@@ -369,6 +369,4 @@ public class SQLiteEventStore {
 
         return hotelInfoList;
     }
-
-
 }

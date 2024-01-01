@@ -3,21 +3,17 @@ package org.ulpgc.dacd.control;
 import java.time.LocalDate;
 import java.util.*;
 
-public class TripPlanner {
+public class WeatherBusinessLogic {
 
 
     private final SQLiteEventStore eventStore;
 
-    public TripPlanner(SQLiteEventStore eventStore) {
+    public WeatherBusinessLogic(SQLiteEventStore eventStore) {
         this.eventStore = eventStore;
     }
 
     public Map<String, Object> getWeatherInfo(String locationName, String predictionDate) {
         return eventStore.getWeatherInfo(locationName, predictionDate);
-    }
-
-    public List<String> getAvailableLocations() {
-        return eventStore.getAvailableLocations();
     }
 
     public String compareWeatherConditions(String selectedLocation, String selectedDate) {
@@ -196,5 +192,23 @@ public class TripPlanner {
 
         recommendation.append("Si quiere tener una predicción del tiempo más certera para un día en concreto visita la pestaña 'Predicción del Tiempo'.\n");
         return recommendation.toString();
+    }
+
+    public boolean isDataAvailableForDates(String locationName, LocalDate checkInDate, LocalDate checkOutDate) {
+        if (checkInDate != null && checkOutDate != null) {
+            // Ambas fechas están presentes, deben estar dentro del rango
+            boolean isCheckInDateInRange = eventStore.getAvailableDates().contains(checkInDate.toString());
+            boolean isCheckOutDateInRange = eventStore.getAvailableDates().contains(checkOutDate.toString());
+
+            return isCheckInDateInRange && isCheckOutDateInRange;
+        } else if (checkInDate != null) {
+            // Solo check-in está presente, debe estar dentro del rango
+            return eventStore.getAvailableDates().contains(checkInDate.toString());
+        } else if (checkOutDate != null) {
+            // Solo check-out está presente, debe estar dentro del rango
+            return eventStore.getAvailableDates().contains(checkOutDate.toString());
+        }
+
+        return false; // Ninguna de las fechas está presente
     }
 }

@@ -32,9 +32,14 @@ public class TripPlannerWebUI extends Application {
         tabPane.getTabs().addAll(predictionTab, recommendationTab, hotelTab);
 
         Scene scene = new Scene(tabPane, 800, 600);
+
+        // Agrega la hoja de estilo a la escena
+        scene.getStylesheets().add(getClass().getResource("/styles.css").toExternalForm());
+
         primaryStage.setScene(scene);
         primaryStage.show();
     }
+
 
     private Tab createPredictionTab() {
         Tab predictionTab = new Tab("Predicción del Tiempo");

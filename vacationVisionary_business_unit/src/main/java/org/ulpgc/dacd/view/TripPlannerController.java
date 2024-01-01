@@ -6,8 +6,8 @@ import javafx.scene.layout.VBox;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import org.ulpgc.dacd.control.SQLiteEventStore;
-import org.ulpgc.dacd.control.TripPlanner;
-import org.ulpgc.dacd.control.TripPlannerHotel;
+import org.ulpgc.dacd.control.WeatherBusinessLogic;
+import org.ulpgc.dacd.control.HotelBusinessLogic;
 
 import java.time.LocalDate;
 import java.util.Collections;
@@ -16,21 +16,21 @@ import java.util.Map;
 
 public class TripPlannerController {
 
-    private final TripPlanner tripPlanner;
-    private final TripPlannerHotel tripPlannerHotel;
+    private final WeatherBusinessLogic weatherBusinessLogic;
+    private final HotelBusinessLogic hotelBusinessLogic;
+    private static final String STYLE_CLASS_VBOX = "vbox";
+    private static final String STYLE_CLASS_BUTTON = "button";
 
     public TripPlannerController(SQLiteEventStore eventStore) {
-        this.tripPlanner = new TripPlanner(eventStore);
-        this.tripPlannerHotel = new TripPlannerHotel(eventStore);
+        this.weatherBusinessLogic = new WeatherBusinessLogic(eventStore);
+        this.hotelBusinessLogic = new HotelBusinessLogic(eventStore);
     }
 
     public VBox createPredictionTabContent() {
-        VBox predictionContent = new VBox(10);
-        predictionContent.setPadding(new Insets(10));
-
+        VBox predictionContent = createStyledVBox();
         DatePicker predictionDatePicker = new DatePicker(LocalDate.now());
         ChoiceBox<String> predictionLocationChoiceBox = new ChoiceBox<>();
-        Button predictButton = new Button("Predecir Condiciones");
+        Button predictButton = createStyledButton("Predecir Condiciones");
         WebView predictionWebView = new WebView();
         WebEngine predictionWebEngine = predictionWebView.getEngine();
 
@@ -52,13 +52,11 @@ public class TripPlannerController {
     }
 
     public VBox createRecommendationTabContent() {
-        VBox recommendationContent = new VBox(10);
-        recommendationContent.setPadding(new Insets(10));
-
+        VBox recommendationContent = createStyledVBox();
         DatePicker checkInDatePicker = new DatePicker(LocalDate.now());
         DatePicker checkOutDatePicker = new DatePicker(LocalDate.now().plusDays(1));
         ChoiceBox<String> recommendationLocationChoiceBox = new ChoiceBox<>();
-        Button recommendButton = new Button("Obtener Recomendaciones");
+        Button recommendButton = createStyledButton("Obtener Recomendaciones");
         WebView recommendationWebView = new WebView();
         WebEngine recommendationWebEngine = recommendationWebView.getEngine();
 
@@ -82,11 +80,9 @@ public class TripPlannerController {
     }
 
     public VBox createHotelTabContent() {
-        VBox hotelContent = new VBox(10);
-        hotelContent.setPadding(new Insets(10));
-
+        VBox hotelContent = createStyledVBox();
         ChoiceBox<String> hotelLocationChoiceBox = new ChoiceBox<>();
-        Button getHotelsButton = new Button("Obtener Hoteles Disponibles");
+        Button getHotelsButton = createStyledButton("Obtener Hoteles Disponibles");
         DatePicker checkInDatePicker = new DatePicker(LocalDate.now());
         DatePicker checkOutDatePicker = new DatePicker(LocalDate.now().plusDays(1));
         WebView hotelWebView = new WebView();
@@ -112,14 +108,14 @@ public class TripPlannerController {
     }
 
     private void updateAvailableLocations(ChoiceBox<String> locationChoiceBox) {
-        List<String> availableLocations = tripPlannerHotel.getAvailableHotelLocations();
+        List<String> availableLocations = hotelBusinessLogic.getAvailableHotelLocations();
         locationChoiceBox.getItems().clear();
         locationChoiceBox.getItems().addAll(availableLocations);
     }
 
     private void handlePredictionButtonClick(String selectedLocation, LocalDate selectedDate, WebEngine webEngine) {
         String formattedDate = selectedDate != null ? selectedDate.toString() : null;
-        String predictionResult = tripPlanner.compareWeatherConditions(selectedLocation, formattedDate);
+        String predictionResult = weatherBusinessLogic.compareWeatherConditions(selectedLocation, formattedDate);
 
         if (predictionResult.isEmpty()) {
             showAlert(Alert.AlertType.INFORMATION, "Sin datos", "No hay datos disponibles para la fecha seleccionada.");
@@ -135,16 +131,18 @@ public class TripPlannerController {
             return;
         }
 
+        // Verifica si hay datos disponibles para al menos una de las fechas
+        if (!weatherBusinessLogic.isDataAvailableForDates(selectedLocation, checkInDate, checkOutDate)) {
+            showAlert(Alert.AlertType.WARNING, "Datos insuficientes", "No hay datos disponibles para la(s) fecha(s) seleccionada(s).");
+            return;
+        }
+
         webEngine.loadContent(""); // Limpiar contenido
 
         try {
-            List<Map<String, Object>> weatherData = tripPlanner.getWeatherInfoInRange(selectedLocation, checkInDate, checkOutDate);
-            List<Map<String, String>> weatherStatusList = Collections.singletonList(tripPlanner.getWeatherStatusForDate(weatherData));
-
-            String recommendation = tripPlanner.generateWeatherRecommendation(weatherStatusList);
-
-            showAlert(Alert.AlertType.INFORMATION, "Recomendación de viaje", recommendation);
-
+            List<Map<String, Object>> weatherData = weatherBusinessLogic.getWeatherInfoInRange(selectedLocation, checkInDate, checkOutDate);
+            List<Map<String, String>> weatherStatusList = Collections.singletonList(weatherBusinessLogic.getWeatherStatusForDate(weatherData));
+            String recommendation = weatherBusinessLogic.generateWeatherRecommendation(weatherStatusList);
             String htmlContent = "<html><body>" + recommendation + "</body></html>";
             webEngine.loadContent(htmlContent);
         } catch (Exception ex) {
@@ -152,6 +150,7 @@ public class TripPlannerController {
             showAlert(Alert.AlertType.ERROR, "Error", "Se produjo un error. Por favor, inténtalo de nuevo.");
         }
     }
+
 
     private void handleGetHotelsButtonClick(String selectedLocation, LocalDate checkInDate, LocalDate checkOutDate, WebEngine webEngine) {
         if (checkInDate == null || checkOutDate == null || checkInDate.isAfter(checkOutDate)) {
@@ -162,8 +161,8 @@ public class TripPlannerController {
         webEngine.loadContent(""); // Limpiar contenido
 
         try {
-            List<Map<String, Object>> hotelData = tripPlannerHotel.getHotelInfoForDates(selectedLocation, checkInDate, checkOutDate);
-            String htmlContent = TripPlannerHotel.buildHotelInfoHTML(hotelData);
+            List<Map<String, Object>> hotelData = hotelBusinessLogic.getHotelInfoForDates(selectedLocation, checkInDate, checkOutDate);
+            String htmlContent = HotelBusinessLogic.buildHotelInfoHTML(hotelData);
             webEngine.loadContent(htmlContent);
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -171,7 +170,18 @@ public class TripPlannerController {
         }
     }
 
+    private VBox createStyledVBox() {
+        VBox styledVBox = new VBox(10);
+        styledVBox.getStyleClass().add(STYLE_CLASS_VBOX);
+        styledVBox.setPadding(new Insets(10));
+        return styledVBox;
+    }
 
+    private Button createStyledButton(String text) {
+        Button button = new Button(text);
+        button.getStyleClass().add(STYLE_CLASS_BUTTON);
+        return button;
+    }
 
     private void showAlert(Alert.AlertType alertType, String title, String content) {
         Alert alert = new Alert(alertType);

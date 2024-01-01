@@ -6,5 +6,4 @@ public class Main {
     VacationVisionarySubscriber topicSubscriber = new VacationVisionarySubscriber();
     topicSubscriber.start();
 }
-
 }
