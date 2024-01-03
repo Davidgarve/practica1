@@ -1,28 +1,55 @@
 package org.ulpc.dacd.control;
+
 import org.ulpc.dacd.model.Location;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Main {
 
     public static void main(String[] args) {
-        String apiKey = args[0];
-        OpenWeatherMapSupplier supplier = new OpenWeatherMapSupplier(apiKey);
+        if (args.length < 1) {
+            System.out.println("Usage: java Main <api-key>");
+            System.exit(1);
+        }
 
-        Location madrid = new Location(40.41581172250397, -3.6927121960696088,  "Madrid");
-        Location barcelona = new Location(41.387120696877425, 2.1960018069652363, "Barcelona");
-        Location valencia = new Location(39.47266732471288, -0.36124752700365187, "Valencia");
-        Location oviedo = new Location(43.36293697609066, -5.8563961741044075, "Oviedo");
-        Location marbella = new Location(36.50799477649729, -4.905502059451248, "Marbella");
-        Location mallorca = new Location(39.565888338910476, 2.652656263464681, "Mallorca");
-        Location bilbao = new Location(43.26725507112307, -2.9341964108977976, "Bilbao");
-        Location tenerife = new Location(28.12094382231223, -16.774909594488363, "Tenerife");
+        String apiKey = args[0];
+        String locationsFile = "locations.txt";
+
+        List<Location> locations = readLocationsFromFile(locationsFile);
 
         String brokerURL = "tcp://localhost:61616";
         String topicName = "prediction.weather";
 
+        OpenWeatherMapSupplier supplier = new OpenWeatherMapSupplier(apiKey);
         JmsWeatherStore jmsWeatherStore = new JmsWeatherStore();
         WeatherController weatherController = new WeatherController(supplier, jmsWeatherStore, brokerURL, topicName);
-        weatherController.execute(madrid, barcelona, valencia, oviedo, marbella, mallorca, bilbao, tenerife);
+        weatherController.execute(locations.toArray(new Location[0]));
     }
 
+    private static List<Location> readLocationsFromFile(String fileName) {
+        List<Location> locations = new ArrayList<>();
 
+        try (InputStream inputStream = Main.class.getClassLoader().getResourceAsStream(fileName);
+             BufferedReader br = new BufferedReader(new InputStreamReader(inputStream))) {
+
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] parts = line.split(",");
+                double latitude = Double.parseDouble(parts[0]);
+                double longitude = Double.parseDouble(parts[1]);
+                String name = parts[2];
+                Location location = new Location(latitude, longitude, name);
+                locations.add(location);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return locations;
+    }
 }
