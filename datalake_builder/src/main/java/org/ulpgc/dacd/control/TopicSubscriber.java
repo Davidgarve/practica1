@@ -30,43 +30,26 @@ public class TopicSubscriber implements Subscriber {
             EventStore eventStore = new EventStore(baseDirectory);
             System.out.println("Waiting for messages...");
 
-            Thread ratesThread = new Thread(() -> {
-                try {
-                    while (true) {
-                        Message ratesMessage = ratesSubscriber.receive();
-                        processMessage(ratesMessage, eventStore, ratesTopicName);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            });
-            ratesThread.start();
+            MessageListener ratesListener = message -> processMessage(message, eventStore, ratesTopicName);
+            ratesSubscriber.setMessageListener(ratesListener);
 
-            Thread weatherThread = new Thread(() -> {
-                try {
-                    while (true) {
-                        Message weatherMessage = weatherSubscriber.receive();
-                        processMessage(weatherMessage, eventStore, weatherTopicName);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            });
-            weatherThread.start();
-
-            ratesThread.join();
-            weatherThread.join();
+            MessageListener weatherListener = message -> processMessage(message, eventStore, weatherTopicName);
+            weatherSubscriber.setMessageListener(weatherListener);
 
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private void processMessage(Message message, EventStore eventStore, String topic) throws JMSException {
-        if (message instanceof TextMessage) {
-            TextMessage textMessage = (TextMessage) message;
-            System.out.println("Received message: " + textMessage.getText());
-            eventStore.storeEvent(textMessage.getText(), topic);
+    private void processMessage(Message message, EventStore eventStore, String topic) {
+        try {
+            if (message instanceof TextMessage) {
+                TextMessage textMessage = (TextMessage) message;
+                System.out.println("Received message: " + textMessage.getText());
+                eventStore.storeEvent(textMessage.getText(), topic);
+            }
+        } catch (JMSException e) {
+            e.printStackTrace();
         }
     }
 }
