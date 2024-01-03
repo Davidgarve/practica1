@@ -1,64 +1,65 @@
 package org.ulpgc.dacd.view;
 
-import javafx.application.Application;
-import javafx.scene.Scene;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
-import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
 import org.ulpgc.dacd.control.SQLiteEventStore;
 
-public class TripPlannerWebUI extends Application {
+import javax.swing.*;
+import java.awt.*;
+
+public class TripPlannerWebUI extends JFrame {
 
     private final TripPlannerController tripPlannerController;
 
     public TripPlannerWebUI() {
         this.tripPlannerController = new TripPlannerController(new SQLiteEventStore());
+        initComponents();
     }
 
     public static void main(String[] args) {
-        launch(args);
+        SwingUtilities.invokeLater(() -> {
+            TripPlannerWebUI tripPlannerWebUI = new TripPlannerWebUI();
+            tripPlannerWebUI.setVisible(true);
+        });
     }
 
-    @Override
-    public void start(Stage primaryStage) {
-        primaryStage.setTitle("Trip Planner Web UI");
+    private void initComponents() {
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setTitle("Trip Planner Web UI");
 
-        TabPane tabPane = new TabPane();
-        Tab predictionTab = createPredictionTab();
-        Tab recommendationTab = createRecommendationTab();
-        Tab hotelTab = createHotelTab();
+        JTabbedPane tabbedPane = new JTabbedPane();
+        JPanel predictionPanel = createPredictionPanel();
+        JPanel recommendationPanel = createRecommendationPanel();
+        JPanel hotelPanel = createHotelPanel();
 
-        tabPane.getTabs().addAll(predictionTab, recommendationTab, hotelTab);
+        tabbedPane.addTab("Predicción del Tiempo", predictionPanel);
+        tabbedPane.addTab("Recomendaciones de Viaje", recommendationPanel);
+        tabbedPane.addTab("Hoteles Disponibles", hotelPanel);
 
-        Scene scene = new Scene(tabPane, 800, 600);
-
-        // Agrega la hoja de estilo a la escena
-        scene.getStylesheets().add(getClass().getResource("/styles.css").toExternalForm());
-
-        primaryStage.setScene(scene);
-        primaryStage.show();
+        getContentPane().add(tabbedPane);
+        pack();
+        setLocationRelativeTo(null);
     }
 
-
-    private Tab createPredictionTab() {
-        Tab predictionTab = new Tab("Predicción del Tiempo");
-        VBox predictionContent = tripPlannerController.createPredictionTabContent();
-        predictionTab.setContent(predictionContent);
-        return predictionTab;
+    private JPanel createPredictionPanel() {
+        JPanel predictionPanel = new JPanel();
+        predictionPanel.setLayout(new BorderLayout());
+        JPanel predictionContent = tripPlannerController.createPredictionTabContent();
+        predictionPanel.add(predictionContent, BorderLayout.CENTER);
+        return predictionPanel;
     }
 
-    private Tab createRecommendationTab() {
-        Tab recommendationTab = new Tab("Recomendaciones de Viaje");
-        VBox recommendationContent = tripPlannerController.createRecommendationTabContent();
-        recommendationTab.setContent(recommendationContent);
-        return recommendationTab;
+    private JPanel createRecommendationPanel() {
+        JPanel recommendationPanel = new JPanel();
+        recommendationPanel.setLayout(new BorderLayout());
+        JPanel recommendationContent = tripPlannerController.createRecommendationTabContent();
+        recommendationPanel.add(recommendationContent, BorderLayout.CENTER);
+        return recommendationPanel;
     }
 
-    private Tab createHotelTab() {
-        Tab hotelTab = new Tab("Hoteles Disponibles");
-        VBox hotelContent = tripPlannerController.createHotelTabContent();
-        hotelTab.setContent(hotelContent);
-        return hotelTab;
+    private JPanel createHotelPanel() {
+        JPanel hotelPanel = new JPanel();
+        hotelPanel.setLayout(new BorderLayout());
+        JPanel hotelContent = tripPlannerController.createHotelTabContent();
+        hotelPanel.add(hotelContent, BorderLayout.CENTER);
+        return hotelPanel;
     }
 }

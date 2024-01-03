@@ -26,7 +26,10 @@ public class WeatherBusinessLogic {
             Map<String, Object> weatherMap = getWeatherInfo(location, selectedDate);
 
             if (weatherMap != null) {
-                advice.append(getWeatherDescription(weatherMap)).append("\n");
+                String weatherDescription = getWeatherDescription(weatherMap);
+                // Eliminar etiquetas HTML
+                weatherDescription = weatherDescription.replaceAll("<[^>]*>", "");
+                advice.append(weatherDescription).append("\n");
             } else {
                 advice.append("No se encontró información meteorológica.\n");
             }

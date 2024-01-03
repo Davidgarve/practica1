@@ -7,6 +7,7 @@ import com.google.gson.JsonParser;
 
 import java.sql.*;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -40,17 +41,16 @@ public class SQLiteEventStore {
                     "hotel_id INTEGER," +
                     "check_in TEXT," +
                     "check_out TEXT," +
-                    "UNIQUE(hotel_id, check_in, check_out)," +  // Restricción única en la combinación de columnas
+                    "UNIQUE(hotel_id, check_in, check_out)," +
                     "FOREIGN KEY (hotel_id) REFERENCES Hotel(hotel_id)" +
                     ");");
 
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS HotelRates (" +
-                    "hotelrates_id INTEGER PRIMARY KEY AUTOINCREMENT," +
                     "checkinout_id INTEGER," +
                     "name TEXT," +
                     "rate REAL," +
                     "tax REAL," +
-                    "UNIQUE(checkinout_id, name, rate, tax)," +  // Restricción única en la combinación de columnas
+                    "UNIQUE(checkinout_id, name, rate, tax)," +
                     "FOREIGN KEY (checkinout_id) REFERENCES CheckInOut(checkinout_id)" +
                     ");");
 
@@ -93,17 +93,35 @@ public class SQLiteEventStore {
 
 
     public static void insertCheckInOut(String json) {
-        try (Connection connection = getConnection();
-             PreparedStatement statement = connection.prepareStatement(
-                     "INSERT INTO CheckInOut (hotel_id, check_in, check_out) VALUES (?, ?, ?) ON CONFLICT(hotel_id, check_in, check_out) DO NOTHING")) {
-
+        try (Connection connection = getConnection()) {
             JsonObject jsonObject = JsonParser.parseString(json).getAsJsonObject();
 
             int hotelId = getHotelId(jsonObject.get("hotelName").getAsString());
-            statement.setInt(1, hotelId);
-            statement.setString(2, jsonObject.get("checkIn").getAsString());
-            statement.setString(3, jsonObject.get("checkOut").getAsString());
-            statement.executeUpdate();
+            String checkInDateStr = jsonObject.get("checkIn").getAsString();
+
+            // Eliminar las filas con fechas de check_in anteriores a la fecha actual
+            deleteOldCheckInOutRows(connection);
+
+            // Insertar la nueva fila
+            try (PreparedStatement statement = connection.prepareStatement(
+                    "INSERT INTO CheckInOut (hotel_id, check_in, check_out) VALUES (?, ?, ?)")) {
+
+                statement.setInt(1, hotelId);
+                statement.setString(2, checkInDateStr);
+                statement.setString(3, jsonObject.get("checkOut").getAsString());
+                statement.executeUpdate();
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void deleteOldCheckInOutRows(Connection connection) {
+        try (PreparedStatement deleteStatement = connection.prepareStatement(
+                "DELETE FROM CheckInOut WHERE DATE(check_in) < DATE('now')")) {
+
+            deleteStatement.executeUpdate();
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -111,29 +129,45 @@ public class SQLiteEventStore {
     }
 
     public static void insertHotelRates(String json) {
-        try (Connection connection = getConnection();
-             PreparedStatement statement = connection.prepareStatement(
-                     "INSERT INTO HotelRates (checkinout_id, name, rate, tax) VALUES (?, ?, ?, ?) ON CONFLICT(checkinout_id, name, rate, tax) DO NOTHING")) {
-
+        try (Connection connection = getConnection()) {
             JsonObject jsonObject = JsonParser.parseString(json).getAsJsonObject();
             int checkInOutId = getCheckInOutId(jsonObject);
 
+            deleteHotelRatesForCheckInOutId(checkInOutId, connection);
+
+            // Insertar nuevos registros
             JsonArray ratesArray = jsonObject.getAsJsonArray("rates");
 
-            for (JsonElement rateElement : ratesArray) {
-                JsonObject rateJson = rateElement.getAsJsonObject();
+            try (PreparedStatement statement = connection.prepareStatement(
+                    "INSERT INTO HotelRates (checkinout_id, name, rate, tax) VALUES (?, ?, ?, ?)")) {
 
-                String name = rateJson.get("name").getAsString();
-                Double rate = rateJson.get("rate").getAsDouble();
-                Double tax = rateJson.get("tax").getAsDouble();
+                for (JsonElement rateElement : ratesArray) {
+                    JsonObject rateJson = rateElement.getAsJsonObject();
 
-                statement.setInt(1, checkInOutId);
-                statement.setString(2, name);
-                statement.setDouble(3, rate);
-                statement.setDouble(4, tax);
+                    String name = rateJson.get("name").getAsString();
+                    Double rate = rateJson.get("rate").getAsDouble();
+                    Double tax = rateJson.get("tax").getAsDouble();
 
-                statement.executeUpdate();
+                    statement.setInt(1, checkInOutId);
+                    statement.setString(2, name);
+                    statement.setDouble(3, rate);
+                    statement.setDouble(4, tax);
+
+                    statement.executeUpdate();
+                }
             }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void deleteHotelRatesForCheckInOutId(int checkInOutId, Connection connection) {
+        try (PreparedStatement deleteStatement = connection.prepareStatement(
+                "DELETE FROM HotelRates WHERE checkinout_id = ?")) {
+
+            deleteStatement.setInt(1, checkInOutId);
+            deleteStatement.executeUpdate();
 
         } catch (SQLException e) {
             e.printStackTrace();
