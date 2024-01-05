@@ -7,6 +7,7 @@ import com.google.gson.JsonParser;
 
 import java.sql.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,9 +32,7 @@ public class SQLiteEventStore {
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS Hotel (" +
                     "hotel_id INTEGER PRIMARY KEY AUTOINCREMENT," +
                     "hotel_name TEXT UNIQUE," +
-                    "location TEXT," +
-                    "ts TEXT," +
-                    "ss TEXT" +
+                    "location TEXT" +
                     ");");
 
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS CheckInOut (" +
@@ -46,11 +45,12 @@ public class SQLiteEventStore {
                     ");");
 
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS HotelRates (" +
+                    "rates_id INTEGER PRIMARY KEY AUTOINCREMENT," +
                     "checkinout_id INTEGER," +
                     "name TEXT," +
                     "rate REAL," +
                     "tax REAL," +
-                    "UNIQUE(checkinout_id, name, rate, tax)," +
+                    "UNIQUE(checkinout_id, name)," +
                     "FOREIGN KEY (checkinout_id) REFERENCES CheckInOut(checkinout_id)" +
                     ");");
 
@@ -62,8 +62,6 @@ public class SQLiteEventStore {
                     "humidity INTEGER," +
                     "clouds INTEGER," +
                     "prediction_date TEXT," +
-                    "ts TEXT," +
-                    "ss TEXT," +
                     "location_name TEXT," +
                     "UNIQUE(prediction_date, location_name)" +
                     ");");
@@ -76,20 +74,19 @@ public class SQLiteEventStore {
     public static void insertHotel(String json) {
         try (Connection connection = getConnection();
              PreparedStatement statement = connection.prepareStatement(
-                     "INSERT INTO Hotel (hotel_name, location, ts, ss) VALUES (?, ?, ?, ?) ON CONFLICT (hotel_name) DO UPDATE SET location=excluded.location, ts=excluded.ts, ss=excluded.ss")) {
+                     "INSERT INTO Hotel (hotel_name, location) VALUES (?, ?) ON CONFLICT (hotel_name) DO UPDATE SET location=excluded.location")) {
 
             JsonObject jsonObject = JsonParser.parseString(json).getAsJsonObject();
 
             statement.setString(1, jsonObject.get("hotelName").getAsString());
             statement.setString(2, jsonObject.get("location").getAsString());
-            statement.setString(3, jsonObject.get("ts").getAsString());
-            statement.setString(4, jsonObject.get("ss").getAsString());
             statement.executeUpdate();
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
+
 
 
     public static void insertCheckInOut(String json) {
@@ -119,7 +116,7 @@ public class SQLiteEventStore {
 
     private static void deleteOldCheckInOutRows(Connection connection) {
         try (PreparedStatement deleteStatement = connection.prepareStatement(
-                "DELETE FROM CheckInOut WHERE DATE(check_in) < DATE('now')")) {
+                "DELETE FROM CheckInOut WHERE DATE(check_in) < DATE('now', 'start of day')")) {
 
             deleteStatement.executeUpdate();
 
@@ -132,18 +129,14 @@ public class SQLiteEventStore {
         try (Connection connection = getConnection()) {
             JsonObject jsonObject = JsonParser.parseString(json).getAsJsonObject();
             int checkInOutId = getCheckInOutId(jsonObject);
-
-            deleteHotelRatesForCheckInOutId(checkInOutId, connection);
-
-            // Insertar nuevos registros
+            deleteHotelRatesForMissingCheckInOut(connection);
             JsonArray ratesArray = jsonObject.getAsJsonArray("rates");
 
             try (PreparedStatement statement = connection.prepareStatement(
-                    "INSERT INTO HotelRates (checkinout_id, name, rate, tax) VALUES (?, ?, ?, ?)")) {
+                    "INSERT OR REPLACE INTO HotelRates (checkinout_id, name, rate, tax) VALUES (?, ?, ?, ?)")) {
 
                 for (JsonElement rateElement : ratesArray) {
                     JsonObject rateJson = rateElement.getAsJsonObject();
-
                     String name = rateJson.get("name").getAsString();
                     Double rate = rateJson.get("rate").getAsDouble();
                     Double tax = rateJson.get("tax").getAsDouble();
@@ -156,17 +149,14 @@ public class SQLiteEventStore {
                     statement.executeUpdate();
                 }
             }
-
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
-    private static void deleteHotelRatesForCheckInOutId(int checkInOutId, Connection connection) {
+    public static void deleteHotelRatesForMissingCheckInOut(Connection connection) {
         try (PreparedStatement deleteStatement = connection.prepareStatement(
-                "DELETE FROM HotelRates WHERE checkinout_id = ?")) {
-
-            deleteStatement.setInt(1, checkInOutId);
+                "DELETE FROM HotelRates WHERE checkinout_id NOT IN (SELECT checkinout_id FROM CheckInOut)")) {
             deleteStatement.executeUpdate();
 
         } catch (SQLException e) {
@@ -175,15 +165,19 @@ public class SQLiteEventStore {
     }
 
 
+
     public void insertWeather(String weatherEvent) {
         try {
             Connection connection = getConnection();
-
             JsonObject jsonObject = JsonParser.parseString(weatherEvent).getAsJsonObject();
 
+            // Eliminar las filas con fechas anteriores a hoy
+            deleteOldWeatherRows(connection);
+
+            // Insertar la nueva fila
             PreparedStatement preparedStatement = connection.prepareStatement(
-                    "INSERT OR REPLACE INTO Weather (pop, wind_speed, temp, humidity, clouds, prediction_date, ss, ts, location_name) " +
-                            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
+                    "INSERT OR REPLACE INTO Weather (pop, wind_speed, temp, humidity, clouds, prediction_date, location_name) " +
+                            "VALUES (?, ?, ?, ?, ?, ?, ?)"
             );
 
             preparedStatement.setDouble(1, jsonObject.get("pop").getAsDouble());
@@ -192,17 +186,25 @@ public class SQLiteEventStore {
             preparedStatement.setInt(4, jsonObject.get("humidity").getAsInt());
             preparedStatement.setInt(5, jsonObject.get("clouds").getAsInt());
             preparedStatement.setString(6, jsonObject.get("predictionDate").getAsString());
-            preparedStatement.setString(7, jsonObject.get("ss").getAsString());
-            preparedStatement.setString(8, jsonObject.get("ts").getAsString());
 
             JsonObject locationJson = jsonObject.getAsJsonObject("location");
             String locationName = locationJson.get("name").getAsString();
-
-            preparedStatement.setString(9, locationName);
+            preparedStatement.setString(7, locationName);
             preparedStatement.executeUpdate();
 
             preparedStatement.close();
             connection.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void deleteOldWeatherRows(Connection connection) {
+        try (PreparedStatement deleteStatement = connection.prepareStatement(
+                "DELETE FROM Weather WHERE strftime('%Y-%m-%d %H:%M:%S', prediction_date) < strftime('%Y-%m-%d %H:%M:%S', 'now', 'start of day')")) {
+
+            deleteStatement.executeUpdate();
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -276,8 +278,6 @@ public class SQLiteEventStore {
                     weatherMap.put("humidity", resultSet.getInt("humidity"));
                     weatherMap.put("clouds", resultSet.getInt("clouds"));
                     weatherMap.put("predictionDate", resultSet.getString("prediction_date"));
-                    weatherMap.put("ss", resultSet.getString("ss"));
-                    weatherMap.put("ts", resultSet.getString("ts"));
                     weatherMap.put("location_name", resultSet.getString("location_name"));
 
                     return weatherMap;
@@ -379,8 +379,6 @@ public class SQLiteEventStore {
                 Map<String, Object> hotelInfo = new HashMap<>();
                 hotelInfo.put("hotelName", resultSet.getString("hotel_name"));
                 hotelInfo.put("location", resultSet.getString("location"));
-                hotelInfo.put("ts", resultSet.getString("ts"));
-                hotelInfo.put("ss", resultSet.getString("ss"));
                 hotelInfo.put("checkIn", resultSet.getString("check_in"));
                 hotelInfo.put("checkOut", resultSet.getString("check_out"));
                 hotelInfo.put("checkInOutId", resultSet.getInt("checkinout_id"));
