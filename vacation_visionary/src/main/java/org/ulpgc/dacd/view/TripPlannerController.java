@@ -19,6 +19,8 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.List;
+import javax.swing.text.html.HTMLDocument;
+import javax.swing.text.html.HTMLEditorKit;
 
 public class TripPlannerController {
 
@@ -174,7 +176,9 @@ public class TripPlannerController {
         JDatePickerImpl checkInDatePicker = new JDatePickerImpl(checkInDatePanel, new DateLabelFormatter());
         JDatePickerImpl checkOutDatePicker = new JDatePickerImpl(checkOutDatePanel, new DateLabelFormatter());
         JButton getHotelsButton = createStyledButton("Get Available Hotels");
-        JTextPane hotelTextPane = new JTextPane();
+
+        // Utilizar un JTextPane con formato HTML
+        JTextPane hotelTextPane = createStyledHtmlTextPane();
 
         updateAvailableLocations(hotelLocationChoiceBox);
 
@@ -183,11 +187,12 @@ public class TripPlannerController {
             Object checkOutDateObject = checkOutDatePicker.getModel().getValue();
 
             if (checkInDateObject instanceof Date && checkOutDateObject instanceof Date) {
+                // Pasar el JTextPane al método handleGetHotelsButtonClick
                 handleGetHotelsButtonClick(
                         (String) hotelLocationChoiceBox.getSelectedItem(),
                         ((Date) checkInDateObject).toInstant().atZone(ZoneId.systemDefault()).toLocalDate(),
                         ((Date) checkOutDateObject).toInstant().atZone(ZoneId.systemDefault()).toLocalDate(),
-                        hotelTextPane.getDocument()
+                        hotelTextPane
                 );
             } else {
                 System.err.println("Unsupported date type");
@@ -219,13 +224,32 @@ public class TripPlannerController {
         hotelContent.add(checkOutDatePicker, gbc);
 
         gbc.gridy++;
+        gbc.gridwidth = 2; // Ocupa dos columnas
         hotelContent.add(getHotelsButton, gbc);
 
+        gbc.gridy++;
+        gbc.gridwidth = 1; // Revierte a ocupar una columna
+
+        // Utilizar JTextPane con formato HTML para mostrar el contenido de los hoteles
         gbc.gridy++;
         hotelContent.add(hotelTextPane, gbc);
 
         return hotelContent;
     }
+
+    private JTextPane createStyledHtmlTextPane() {
+        JTextPane textPane = new JTextPane();
+        HTMLEditorKit htmlEditorKit = new HTMLEditorKit();
+        HTMLDocument htmlDocument = (HTMLDocument) htmlEditorKit.createDefaultDocument();
+        textPane.setEditorKit(htmlEditorKit);
+        textPane.setDocument(htmlDocument);
+        textPane.setContentType("text/html");
+        textPane.setEditable(false);
+        textPane.setBackground(new Color(240, 240, 240));
+        textPane.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+        return textPane;
+    }
+
 
     public static class DateLabelFormatter extends JFormattedTextField.AbstractFormatter {
 
@@ -302,7 +326,7 @@ public class TripPlannerController {
         }
     }
 
-    private void handleGetHotelsButtonClick(String selectedLocation, LocalDate checkInDate, LocalDate checkOutDate, Document document) {
+    private void handleGetHotelsButtonClick(String selectedLocation, LocalDate checkInDate, LocalDate checkOutDate, JTextPane textPane) {
         if (checkInDate == null || checkOutDate == null || checkInDate.isAfter(checkOutDate)) {
             showAlert("Date Error", "Select valid check-in and check-out dates.");
             return;
@@ -310,14 +334,21 @@ public class TripPlannerController {
 
         try {
             List<Map<String, Object>> hotelData = hotelBusinessLogic.getHotelInfoForDates(selectedLocation, checkInDate, checkOutDate);
+
+            // Obtener contenido en formato HTML
             String htmlContent = buildHotelInfoHTML(hotelData);
-            document.putProperty(Document.StreamDescriptionProperty, null);
-            document.remove(0, document.getLength());
-            document.insertString(0, htmlContent, null);
+
+            // Insertar contenido HTML en el JTextPane
+            setTextPaneContent(textPane, htmlContent);
         } catch (Exception ex) {
             ex.printStackTrace();
             showAlert("Error", "An error occurred while obtaining hotel information. Please try again.");
         }
+    }
+
+    private void setTextPaneContent(JTextPane textPane, String content) {
+        textPane.setContentType("text/html");
+        textPane.setText(content);
     }
 
     public static String buildHotelInfoHTML(List<Map<String, Object>> hotelData) {
@@ -326,32 +357,39 @@ public class TripPlannerController {
         if (hotelData.isEmpty()) {
             htmlContent.append("No data available for the selected location and dates.");
         } else {
+            // Utilizar una tabla HTML para organizar los hoteles en columnas
+            htmlContent.append("<table border='1'><tr>");
+
             for (Map<String, Object> hotelInfo : hotelData) {
                 String hotelName = hotelInfo.get("hotelName").toString();
                 String location = hotelInfo.get("location").toString();
                 String checkIn = hotelInfo.get("checkIn").toString();
                 String checkOut = hotelInfo.get("checkOut").toString();
 
-                htmlContent.append(hotelName).append("\n")
-                        .append("Location: ").append(location).append("\n")
-                        .append("Check-In: ").append(checkIn).append("\n")
-                        .append("Check-Out: ").append(checkOut).append("\n");
+                htmlContent.append("<td width='200'>")  // Ancho ajustado a 200 píxeles, ajusta según tus necesidades
+                        .append("<b>").append(hotelName).append("</b>").append("<br>")
+                        .append("Location: ").append(location).append("<br>")
+                        .append("Check-In: ").append(checkIn).append("<br>")
+                        .append("Check-Out: ").append(checkOut).append("<br>");
 
                 List<Map<String, Object>> ratesList = (List<Map<String, Object>>) hotelInfo.get("rates");
                 if (ratesList != null && !ratesList.isEmpty()) {
-                    htmlContent.append("Rates: ").append("\n");
+                    htmlContent.append("<b>Rates:</b>").append("<br>");
                     for (Map<String, Object> rateInfo : ratesList) {
                         String rateName = rateInfo.get("name").toString();
                         Double rateValue = (Double) rateInfo.get("rate");
                         Double taxValue = (Double) rateInfo.get("tax");
 
-                        htmlContent.append(rateName).append(": ").append(rateValue + taxValue).append("\n");
+                        htmlContent.append(rateName).append(": ").append(rateValue + taxValue).append("<br>");
                     }
-                    htmlContent.append("\n");
                 } else {
                     htmlContent.append("No rate data available for this hotel on the selected dates.");
                 }
+
+                htmlContent.append("</td>");
             }
+
+            htmlContent.append("</tr></table>");
         }
 
         return htmlContent.toString();
