@@ -31,13 +31,17 @@ public class VacationVisionaryListener implements MessageListener {
     }
 
     private void processMessageAsync(String json) {
-        CompletableFuture.runAsync(() -> processMessage(json))
-                .exceptionally(ex -> {
-                    System.err.println("Error processing the message asynchronously: " + ex.getMessage());
-                    ex.printStackTrace();
-                    return null;
-                });
+        CompletableFuture.runAsync(() -> {
+            synchronized (SQLiteEventStore.class) {
+                processMessage(json);
+            }
+        }).exceptionally(ex -> {
+            System.err.println("Error processing the message asynchronously: " + ex.getMessage());
+            ex.printStackTrace();
+            return null;
+        });
     }
+
 
     private void processMessage(String json) {
         try {
