@@ -12,7 +12,7 @@
         <module>weather_provider</module>
         <module>datalake_builder</module>
         <module>hotel_provider</module>
-        <module>vacationVisionary_business_unit</module>
+        <module>vacation_visionary</module>
     </modules>
 
     <properties>

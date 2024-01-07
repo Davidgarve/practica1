@@ -7,14 +7,12 @@ import com.google.gson.JsonParser;
 
 import java.sql.*;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class SQLiteEventStore {
+public class SQLiteEventStore implements EventStore{
     private static final String JDBC_URL = "jdbc:sqlite:datamark.db";
 
     static Connection getConnection() {
@@ -25,7 +23,7 @@ public class SQLiteEventStore {
         }
     }
 
-    public static void createTables() {
+    public void createTables() {
         try (Connection connection = getConnection();
              Statement statement = connection.createStatement()) {
 
@@ -71,7 +69,7 @@ public class SQLiteEventStore {
         }
     }
 
-    public static void insertHotel(String json) {
+    public void insertHotel(String json) {
         try (Connection connection = getConnection();
              PreparedStatement statement = connection.prepareStatement(
                      "INSERT INTO Hotel (hotel_name, location) VALUES (?, ?) ON CONFLICT (hotel_name) DO UPDATE SET location=excluded.location")) {
@@ -89,28 +87,42 @@ public class SQLiteEventStore {
 
 
 
-    public static void insertCheckInOut(String json) {
+    public void insertCheckInOut(String json) {
         try (Connection connection = getConnection()) {
             JsonObject jsonObject = JsonParser.parseString(json).getAsJsonObject();
 
             int hotelId = getHotelId(jsonObject.get("hotelName").getAsString());
             String checkInDateStr = jsonObject.get("checkIn").getAsString();
 
-            // Eliminar las filas con fechas de check_in anteriores a la fecha actual
             deleteOldCheckInOutRows(connection);
 
-            // Insertar la nueva fila
-            try (PreparedStatement statement = connection.prepareStatement(
-                    "INSERT INTO CheckInOut (hotel_id, check_in, check_out) VALUES (?, ?, ?)")) {
+            if (!checkInOutRecordExists(connection, hotelId, checkInDateStr, jsonObject.get("checkOut").getAsString())) {
+                try (PreparedStatement statement = connection.prepareStatement(
+                        "INSERT INTO CheckInOut (hotel_id, check_in, check_out) VALUES (?, ?, ?)")) {
 
-                statement.setInt(1, hotelId);
-                statement.setString(2, checkInDateStr);
-                statement.setString(3, jsonObject.get("checkOut").getAsString());
-                statement.executeUpdate();
+                    statement.setInt(1, hotelId);
+                    statement.setString(2, checkInDateStr);
+                    statement.setString(3, jsonObject.get("checkOut").getAsString());
+                    statement.executeUpdate();
+                }
             }
 
         } catch (SQLException e) {
             e.printStackTrace();
+        }
+    }
+
+    private static boolean checkInOutRecordExists(Connection connection, int hotelId, String checkInDate, String checkOutDate) throws SQLException {
+        try (PreparedStatement statement = connection.prepareStatement(
+                "SELECT 1 FROM CheckInOut WHERE hotel_id = ? AND check_in = ? AND check_out = ?")) {
+
+            statement.setInt(1, hotelId);
+            statement.setString(2, checkInDate);
+            statement.setString(3, checkOutDate);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                return resultSet.next();
+            }
         }
     }
 
@@ -125,7 +137,7 @@ public class SQLiteEventStore {
         }
     }
 
-    public static void insertHotelRates(String json) {
+    public void insertHotelRates(String json) {
         try (Connection connection = getConnection()) {
             JsonObject jsonObject = JsonParser.parseString(json).getAsJsonObject();
             int checkInOutId = getCheckInOutId(jsonObject);
@@ -171,10 +183,8 @@ public class SQLiteEventStore {
             Connection connection = getConnection();
             JsonObject jsonObject = JsonParser.parseString(weatherEvent).getAsJsonObject();
 
-            // Eliminar las filas con fechas anteriores a hoy
             deleteOldWeatherRows(connection);
 
-            // Insertar la nueva fila
             PreparedStatement preparedStatement = connection.prepareStatement(
                     "INSERT OR REPLACE INTO Weather (pop, wind_speed, temp, humidity, clouds, prediction_date, location_name) " +
                             "VALUES (?, ?, ?, ?, ?, ?, ?)"
@@ -361,7 +371,7 @@ public class SQLiteEventStore {
 
         try (Connection connection = getConnection();
              PreparedStatement statement = connection.prepareStatement(
-                     "SELECT Hotel.hotel_name, Hotel.location, Hotel.ts, Hotel.ss, CheckInOut.check_in, CheckInOut.check_out, CheckInOut.checkinout_id, HotelRates.name, HotelRates.rate, HotelRates.tax " +
+                     "SELECT Hotel.hotel_name, Hotel.location, CheckInOut.check_in, CheckInOut.check_out, CheckInOut.checkinout_id, HotelRates.name, HotelRates.rate, HotelRates.tax " +
                              "FROM Hotel " +
                              "JOIN CheckInOut ON Hotel.hotel_id = CheckInOut.hotel_id " +
                              "JOIN HotelRates ON CheckInOut.checkinout_id = HotelRates.checkinout_id " +

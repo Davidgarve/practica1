@@ -5,7 +5,6 @@ import java.util.*;
 
 public class WeatherBusinessLogic {
 
-
     private final SQLiteEventStore eventStore;
 
     public WeatherBusinessLogic(SQLiteEventStore eventStore) {
@@ -20,18 +19,16 @@ public class WeatherBusinessLogic {
         List<String> locations = new ArrayList<>();
         locations.add(selectedLocation);
 
-        StringBuilder advice = new StringBuilder("Condiciones meteorológicas para la ubicación " + selectedLocation + " el " + selectedDate + ":\n");
+        StringBuilder advice = new StringBuilder("Weather conditions for location " + selectedLocation + " on " + selectedDate + ":\n");
 
         for (String location : locations) {
             Map<String, Object> weatherMap = getWeatherInfo(location, selectedDate);
 
             if (weatherMap != null) {
                 String weatherDescription = getWeatherDescription(weatherMap);
-                // Eliminar etiquetas HTML
-                weatherDescription = weatherDescription.replaceAll("<[^>]*>", "");
                 advice.append(weatherDescription).append("\n");
             } else {
-                advice.append("No se encontró información meteorológica.\n");
+                advice.append("No weather information found for this date.\n");
             }
         }
 
@@ -40,7 +37,7 @@ public class WeatherBusinessLogic {
 
     private String getWeatherDescription(Map<String, Object> weatherMap) {
         return String.format(
-                "Temperatura: %.2f°C, Viento: %.2f m/s, Humedad: %d%%, Nubosidad: %d%%, Probabilidad de Precipitaciones: %.2f%%",
+                "Temperature: %.2f°C, Wind: %.2f m/s, Humidity: %d%%, Cloudiness: %d%%, Precipitation Probability: %.2f%%.",
                 weatherMap.get("temp"),
                 weatherMap.get("windSpeed"),
                 weatherMap.get("humidity"),
@@ -67,7 +64,6 @@ public class WeatherBusinessLogic {
     public Map<String, String> getWeatherStatusForDate(List<Map<String, Object>> weatherData) {
         Map<String, String> weatherStatus = new HashMap<>();
 
-
         for (Map<String, Object> data : weatherData) {
             double temperature = (double) data.get("temp");
             double precipitationProbability = (double) data.get("pop");
@@ -89,129 +85,87 @@ public class WeatherBusinessLogic {
     }
 
     private String classifyTemperature(double temperature) {
-        if (temperature > 25.0) {
-            return "high";
-        } else if (temperature >= 15.0 && temperature <= 25.0) {
-            return "moderate";
-        } else {
-            return "low";
-        }
+        return (temperature > 25.0) ? "high" : (temperature >= 15.0 && temperature <= 25.0) ? "moderate" : "low";
     }
 
     private String classifyPrecipitation(double precipitationProbability) {
-        if (precipitationProbability < 0.3) {
-            return "low";
-        } else {
-            return "high";
-        }
+        return (precipitationProbability < 0.3) ? "low" : "high";
     }
 
     private String classifyClouds(int clouds) {
-        if (clouds > 70) {
-            return "high";
-        } else if (clouds >= 30 && clouds <= 70) {
-            return "moderate";
-        } else {
-            return "low";
-        }
+        return (clouds > 70) ? "high" : (clouds >= 30 && clouds <= 70) ? "moderate" : "low";
     }
 
     private String classifyWind(double windSpeed) {
-        if (windSpeed >= 5.0) {
-            return "high";
-        } else {
-            return "low";
-        }
+        return (windSpeed >= 5.0) ? "high" : "low";
     }
 
     public String generateWeatherRecommendation(List<Map<String, String>> weatherStatusList) {
-        StringBuilder recommendation = new StringBuilder("Recomendación de viaje:\n");
+        StringBuilder recommendation = new StringBuilder("Travel recommendation:\n");
 
-        boolean highTemperature = weatherStatusList.stream()
-                .allMatch(status -> "high".equals(status.get("temperature")));
-
-        boolean moderateTemperature = weatherStatusList.stream()
-                .allMatch(status -> "moderate".equals(status.get("temperature")));
-
-        boolean lowTemperature = weatherStatusList.stream()
-                .allMatch(status -> "low".equals(status.get("temperature")));
-
-        boolean lowPrecipitation = weatherStatusList.stream()
-                .allMatch(status -> "low".equals(status.get("precipitation")));
-
-        boolean highPrecipitation = weatherStatusList.stream()
-                .allMatch(status -> "high".equals(status.get("precipitation")));
-
-        boolean lowClouds = weatherStatusList.stream()
-                .allMatch(status -> "low".equals(status.get("clouds")));
-
-        boolean moderateClouds = weatherStatusList.stream()
-                .allMatch(status -> "moderate".equals(status.get("clouds")));
-
-        boolean highClouds = weatherStatusList.stream()
-                .allMatch(status -> "high".equals(status.get("clouds")));
-
-        boolean highWind = weatherStatusList.stream()
-                .allMatch(status -> "high".equals(status.get("wind")));
-
-        boolean lowWind = weatherStatusList.stream()
-                .allMatch(status -> "low".equals(status.get("wind")));
+        boolean highTemperature = weatherStatusList.stream().allMatch(status -> "high".equals(status.get("temperature")));
+        boolean moderateTemperature = weatherStatusList.stream().allMatch(status -> "moderate".equals(status.get("temperature")));
+        boolean lowTemperature = weatherStatusList.stream().allMatch(status -> "low".equals(status.get("temperature")));
+        boolean lowPrecipitation = weatherStatusList.stream().allMatch(status -> "low".equals(status.get("precipitation")));
+        boolean highPrecipitation = weatherStatusList.stream().allMatch(status -> "high".equals(status.get("precipitation")));
+        boolean lowClouds = weatherStatusList.stream().allMatch(status -> "low".equals(status.get("clouds")));
+        boolean moderateClouds = weatherStatusList.stream().allMatch(status -> "moderate".equals(status.get("clouds")));
+        boolean highClouds = weatherStatusList.stream().allMatch(status -> "high".equals(status.get("clouds")));
+        boolean highWind = weatherStatusList.stream().allMatch(status -> "high".equals(status.get("wind")));
+        boolean lowWind = weatherStatusList.stream().allMatch(status -> "low".equals(status.get("wind")));
 
         if (highTemperature && lowPrecipitation) {
-            recommendation.append("Le recomiendo visitar el destino seleccionado, ya que se esperan temperaturas altas y baja probabilidad de lluvia durante su estancia.\n");
+            recommendation.append("I recommend visiting the selected destination as high temperatures and low precipitation are expected during your stay.\n");
         }
 
         if (moderateTemperature && lowPrecipitation) {
-            recommendation.append("Le recomiendo visitar el destino seleccionado, ya que se esperan temperaturas moderadas y baja probabilidad de lluvia durante su estancia.\n");
+            recommendation.append("I recommend visiting the selected destination as moderate temperatures and low precipitation are expected during your stay.\n");
         }
 
         if (lowTemperature && lowPrecipitation) {
-            recommendation.append("No le recomiendo visitar el destino seleccionado, ya que se esperan temperaturas bajas. Aunque no se esperan precipitaciones.\n");
+            recommendation.append("I do not recommend visiting the selected destination as low temperatures are expected, although no precipitation is expected.\n");
         }
 
         if (lowTemperature && highPrecipitation) {
-            recommendation.append("No le recomiendo visitar el destino seleccionado, ya que se esperan temperaturas bajas y fuertes precipitaciones.\n");
+            recommendation.append("I do not recommend visiting the selected destination as low temperatures and heavy precipitation are expected.\n");
         }
 
         if (lowClouds) {
-            recommendation.append("Además, se espera que la mayoría de los días de su estancia tenga un cielo despejado.\n");
+            recommendation.append("Additionally, most days of your stay are expected to have clear skies.\n");
         }
 
         if (moderateClouds){
-            recommendation.append("Además, se espera que la mayoría de los días de su estancia tenga un número moderado de nubes.\n");
+            recommendation.append("Additionally, most days of your stay are expected to have a moderate number of clouds.\n");
         }
 
         if (highClouds){
-            recommendation.append("Además, se espera que la mayoría de los días de su estancia tenga un cielo muy nublado.\n");
+            recommendation.append("Additionally, most days of your stay are expected to have a very cloudy sky.\n");
         }
 
         if (highWind){
-            recommendation.append("Por otra parte, se esperan fuertes rachas de viento.\n");
+            recommendation.append("Furthermore, strong wind gusts are expected.\n");
         }
 
         if (lowWind){
-            recommendation.append("Por otra parte, no se esperan fuertes rachas de viento.\n");
+            recommendation.append("Furthermore, no strong wind gusts are expected.\n");
         }
 
-        recommendation.append("Si quiere tener una predicción del tiempo más certera para un día en concreto visita la pestaña 'Predicción del Tiempo'.\n");
+        recommendation.append("If you want a more accurate weather prediction for a specific day, visit the 'Weather Forecast' tab.\n");
         return recommendation.toString();
     }
 
-    public boolean isDataAvailableForDates(String locationName, LocalDate checkInDate, LocalDate checkOutDate) {
+    public boolean isDataAvailableForDates(LocalDate checkInDate, LocalDate checkOutDate) {
         if (checkInDate != null && checkOutDate != null) {
-            // Ambas fechas están presentes, deben estar dentro del rango
             boolean isCheckInDateInRange = eventStore.getAvailableDates().contains(checkInDate.toString());
             boolean isCheckOutDateInRange = eventStore.getAvailableDates().contains(checkOutDate.toString());
 
             return isCheckInDateInRange && isCheckOutDateInRange;
         } else if (checkInDate != null) {
-            // Solo check-in está presente, debe estar dentro del rango
             return eventStore.getAvailableDates().contains(checkInDate.toString());
         } else if (checkOutDate != null) {
-            // Solo check-out está presente, debe estar dentro del rango
             return eventStore.getAvailableDates().contains(checkOutDate.toString());
         }
 
-        return false; // Ninguna de las fechas está presente
+        return false;
     }
 }

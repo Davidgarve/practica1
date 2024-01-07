@@ -4,7 +4,7 @@ import org.apache.activemq.ActiveMQConnectionFactory;
 
 import javax.jms.*;
 
-public class VacationVisionarySubscriber {
+public class VacationVisionarySubscriber implements TopicSubscriber {
 
     public void start() {
         try {

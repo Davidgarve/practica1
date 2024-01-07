@@ -3,6 +3,7 @@ package org.ulpgc.dacd.control;
 import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.jms.TextMessage;
+import java.util.concurrent.CompletableFuture;
 
 public class VacationVisionaryListener implements MessageListener {
 
@@ -20,12 +21,22 @@ public class VacationVisionaryListener implements MessageListener {
             String json;
             try {
                 json = textMessage.getText();
-                processMessage(json);
+                System.out.println("Event received: " + json);
+                processMessageAsync(json);
             } catch (Exception e) {
-                System.err.println("Error al procesar el mensaje: " + e.getMessage());
+                System.err.println("Error processing the message: " + e.getMessage());
                 e.printStackTrace();
             }
         }
+    }
+
+    private void processMessageAsync(String json) {
+        CompletableFuture.runAsync(() -> processMessage(json))
+                .exceptionally(ex -> {
+                    System.err.println("Error processing the message asynchronously: " + ex.getMessage());
+                    ex.printStackTrace();
+                    return null;
+                });
     }
 
     private void processMessage(String json) {
@@ -35,15 +46,15 @@ public class VacationVisionaryListener implements MessageListener {
                     eventStore.insertWeather(json);
                     break;
                 case "hotel.rates":
-                    SQLiteEventStore.insertHotel(json);
-                    SQLiteEventStore.insertCheckInOut(json);
-                    SQLiteEventStore.insertHotelRates(json);
+                    eventStore.insertHotel(json);
+                    eventStore.insertCheckInOut(json);
+                    eventStore.insertHotelRates(json);
                     break;
                 default:
                     System.out.println("Unhandled topic: " + topic);
             }
         } catch (Exception e) {
-            System.err.println("Error al procesar el mensaje: " + e.getMessage());
+            System.err.println("Error processing the message: " + e.getMessage());
             e.printStackTrace();
         }
     }

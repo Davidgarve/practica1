@@ -30,9 +30,9 @@ public class TripPlannerWebUI extends JFrame {
         JPanel recommendationPanel = createRecommendationPanel();
         JPanel hotelPanel = createHotelPanel();
 
-        tabbedPane.addTab("Predicción del Tiempo", predictionPanel);
-        tabbedPane.addTab("Recomendaciones de Viaje", recommendationPanel);
-        tabbedPane.addTab("Hoteles Disponibles", hotelPanel);
+        tabbedPane.addTab("Weather Forecast", predictionPanel);
+        tabbedPane.addTab("Travel Recommendations", recommendationPanel);
+        tabbedPane.addTab("Available Hotels", hotelPanel);
 
         getContentPane().add(tabbedPane);
         pack();

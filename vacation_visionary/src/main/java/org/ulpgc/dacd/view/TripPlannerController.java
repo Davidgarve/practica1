@@ -38,7 +38,7 @@ public class TripPlannerController {
         JDatePickerImpl predictionDatePicker = new JDatePickerImpl(datePanel, new DateLabelFormatter());
 
         JComboBox<String> predictionLocationChoiceBox = new JComboBox<>();
-        JButton predictButton = createStyledButton("Predecir Condiciones");
+        JButton predictButton = createStyledButton("Predict Conditions");
         JTextPane predictionTextPane = new JTextPane();
 
         updateAvailableLocations(predictionLocationChoiceBox);
@@ -71,33 +71,32 @@ public class TripPlannerController {
         gbc.anchor = GridBagConstraints.LINE_START;
         gbc.insets = new Insets(10, 0, 5, 5);
 
-        predictionContent.add(new JLabel("Atención: Este servicio solo ofrece respuestas para un rango máximo de 5 días después de hoy"));
+        predictionContent.add(new JLabel("Attention: This service only provides responses for a maximum range of 5 days after today"));
         gbc.gridy++;
-        predictionContent.add(new JLabel("Ubicación"), gbc);
+        predictionContent.add(new JLabel("Location"), gbc);
 
         gbc.gridy++;
         predictionContent.add(predictionDatePicker, gbc);
 
         gbc.gridy++;
-        predictionContent.add(new JLabel("Ubicación"), gbc);
+        predictionContent.add(new JLabel("Location"), gbc);
 
         gbc.gridy++;
         predictionContent.add(predictionLocationChoiceBox, gbc);
 
         gbc.gridy++;
-        gbc.gridwidth = 2; // Ocupa dos columnas
+        gbc.gridwidth = 2; // Occupies two columns
         predictionContent.add(predictButton, gbc);
 
         gbc.gridy++;
-        gbc.gridwidth = 1; // Vuelve a ocupar una columna
-        predictionContent.add(new JLabel("Solución"), gbc);
+        gbc.gridwidth = 1; // Reverts to occupying one column
+        predictionContent.add(new JLabel("Solution"), gbc);
 
         gbc.gridx = 1;
         predictionContent.add(predictionTextPane, gbc);
 
         return predictionContent;
     }
-
 
     public JPanel createRecommendationTabContent() {
         JPanel recommendationContent = createStyledJPanel();
@@ -109,7 +108,7 @@ public class TripPlannerController {
         JDatePickerImpl checkInDatePicker = new JDatePickerImpl(checkInDatePanel, new DateLabelFormatter());
         JDatePickerImpl checkOutDatePicker = new JDatePickerImpl(checkOutDatePanel, new DateLabelFormatter());
         JComboBox<String> recommendationLocationChoiceBox = new JComboBox<>();
-        JButton recommendButton = createStyledButton("Obtener Recomendaciones");
+        JButton recommendButton = createStyledButton("Get Recommendations");
         JTextPane recommendationTextPane = new JTextPane();
 
         updateAvailableLocations(recommendationLocationChoiceBox);
@@ -130,27 +129,27 @@ public class TripPlannerController {
             }
         });
 
-        // Cambios en la disposición de los componentes
+        // Changes in the layout of components
         recommendationContent.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.NORTHWEST;
-        recommendationContent.add(new JLabel("Atención: Este servicio solo ofrece respuestas para un rango máximo de 5 días después de hoy"));
+        recommendationContent.add(new JLabel("Attention: This service only provides responses for a maximum range of 5 days after today"));
         gbc.gridy++;
-        recommendationContent.add(new JLabel("Ubicación"), gbc);
+        recommendationContent.add(new JLabel("Location"), gbc);
 
         gbc.gridy++;
         recommendationContent.add(checkInDatePicker, gbc);
 
         gbc.gridy++;
-        recommendationContent.add(new JLabel("Fecha de Check-Out"), gbc);
+        recommendationContent.add(new JLabel("Check-Out Date"), gbc);
 
         gbc.gridy++;
         recommendationContent.add(checkOutDatePicker, gbc);
 
         gbc.gridy++;
-        recommendationContent.add(new JLabel("Ubicación"), gbc);
+        recommendationContent.add(new JLabel("Location"), gbc);
 
         gbc.gridy++;
         recommendationContent.add(recommendationLocationChoiceBox, gbc);
@@ -174,7 +173,7 @@ public class TripPlannerController {
         JDatePanelImpl checkOutDatePanel = new JDatePanelImpl(checkOutModel, properties);
         JDatePickerImpl checkInDatePicker = new JDatePickerImpl(checkInDatePanel, new DateLabelFormatter());
         JDatePickerImpl checkOutDatePicker = new JDatePickerImpl(checkOutDatePanel, new DateLabelFormatter());
-        JButton getHotelsButton = createStyledButton("Obtener Hoteles Disponibles");
+        JButton getHotelsButton = createStyledButton("Get Available Hotels");
         JTextPane hotelTextPane = new JTextPane();
 
         updateAvailableLocations(hotelLocationChoiceBox);
@@ -200,21 +199,21 @@ public class TripPlannerController {
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.NORTHWEST;
-        hotelContent.add(new JLabel("Atención: Este servicio solo ofrece respuestas para un rango máximo de 5 días después de hoy"));
+        hotelContent.add(new JLabel("Attention: This service only provides responses for a maximum range of 5 days after today"));
         gbc.gridy++;
-        hotelContent.add(new JLabel("Ubicación"), gbc);
+        hotelContent.add(new JLabel("Location"), gbc);
 
         gbc.gridy++;
         hotelContent.add(hotelLocationChoiceBox, gbc);
 
         gbc.gridy++;
-        hotelContent.add(new JLabel("Fecha de Check-In"), gbc);
+        hotelContent.add(new JLabel("Check-In Date"), gbc);
 
         gbc.gridy++;
         hotelContent.add(checkInDatePicker, gbc);
 
         gbc.gridy++;
-        hotelContent.add(new JLabel("Fecha de Check-Out"), gbc);
+        hotelContent.add(new JLabel("Check-Out Date"), gbc);
 
         gbc.gridy++;
         hotelContent.add(checkOutDatePicker, gbc);
@@ -266,7 +265,7 @@ public class TripPlannerController {
         String predictionResult = weatherBusinessLogic.compareWeatherConditions(selectedLocation, formattedDate);
 
         if (predictionResult.isEmpty()) {
-            showAlert("Sin datos", "No hay datos disponibles para la fecha seleccionada.");
+            showAlert("No Data", "No data available for the selected date.");
         } else {
             document.putProperty(Document.StreamDescriptionProperty, null);
             try {
@@ -280,13 +279,13 @@ public class TripPlannerController {
 
     private void handleRecommendationButtonClick(String selectedLocation, LocalDate checkInDate, LocalDate checkOutDate, Document document) {
         if (checkInDate == null || checkOutDate == null || checkInDate.isAfter(checkOutDate)) {
-            showAlert("Error de fechas", "Selecciona fechas de check-in y check-out válidas.");
+            showAlert("Date Error", "Select valid check-in and check-out dates.");
             return;
         }
 
-        // Verifica si hay datos disponibles para al menos una de las fechas
-        if (!weatherBusinessLogic.isDataAvailableForDates(selectedLocation, checkInDate, checkOutDate)) {
-            showAlert("Datos insuficientes", "No hay datos disponibles para la(s) fecha(s) seleccionada(s).");
+        // Check if there is data available for at least one of the dates
+        if (!weatherBusinessLogic.isDataAvailableForDates(checkInDate, checkOutDate)) {
+            showAlert("Insufficient Data", "No data available for the selected date(s).");
             return;
         }
 
@@ -299,13 +298,13 @@ public class TripPlannerController {
             document.insertString(0, recommendation, null);
         } catch (Exception ex) {
             ex.printStackTrace();
-            showAlert("Error", "Se produjo un error. Por favor, inténtalo de nuevo.");
+            showAlert("Error", "An error occurred. Please try again.");
         }
     }
 
     private void handleGetHotelsButtonClick(String selectedLocation, LocalDate checkInDate, LocalDate checkOutDate, Document document) {
         if (checkInDate == null || checkOutDate == null || checkInDate.isAfter(checkOutDate)) {
-            showAlert("Error de fechas", "Selecciona fechas de check-in y check-out válidas.");
+            showAlert("Date Error", "Select valid check-in and check-out dates.");
             return;
         }
 
@@ -317,7 +316,7 @@ public class TripPlannerController {
             document.insertString(0, htmlContent, null);
         } catch (Exception ex) {
             ex.printStackTrace();
-            showAlert("Error", "Se produjo un error al obtener la información de hoteles. Por favor, inténtalo de nuevo.");
+            showAlert("Error", "An error occurred while obtaining hotel information. Please try again.");
         }
     }
 
@@ -325,7 +324,7 @@ public class TripPlannerController {
         StringBuilder htmlContent = new StringBuilder();
 
         if (hotelData.isEmpty()) {
-            htmlContent.append("No hay datos disponibles para la ubicación y fechas seleccionadas.");
+            htmlContent.append("No data available for the selected location and dates.");
         } else {
             for (Map<String, Object> hotelInfo : hotelData) {
                 String hotelName = hotelInfo.get("hotelName").toString();
@@ -334,7 +333,7 @@ public class TripPlannerController {
                 String checkOut = hotelInfo.get("checkOut").toString();
 
                 htmlContent.append(hotelName).append("\n")
-                        .append("Ubicación: ").append(location).append("\n")
+                        .append("Location: ").append(location).append("\n")
                         .append("Check-In: ").append(checkIn).append("\n")
                         .append("Check-Out: ").append(checkOut).append("\n");
 
@@ -350,14 +349,13 @@ public class TripPlannerController {
                     }
                     htmlContent.append("\n");
                 } else {
-                    htmlContent.append("No hay datos de tarifas disponibles para este hotel en las fechas seleccionadas.");
+                    htmlContent.append("No rate data available for this hotel on the selected dates.");
                 }
             }
         }
 
         return htmlContent.toString();
     }
-
 
     private JPanel createStyledJPanel() {
         JPanel styledPanel = new JPanel();
