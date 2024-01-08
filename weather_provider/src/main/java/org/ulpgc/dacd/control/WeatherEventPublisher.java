@@ -1,6 +1,6 @@
-package org.ulpc.dacd.control;
+package org.ulpgc.dacd.control;
 
-import org.ulpc.dacd.model.Weather;
+import org.ulpgc.dacd.model.Weather;
 
 public interface WeatherEventPublisher {
      void sendWeatherToBroker(Weather weather, String brokerURL, String queueName);

@@ -1,10 +1,10 @@
-package org.ulpc.dacd.control;
+package org.ulpgc.dacd.control;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import org.ulpc.dacd.model.Location;
-import org.ulpc.dacd.model.Weather;
+import org.ulpgc.dacd.model.Location;
+import org.ulpgc.dacd.model.Weather;
 
 import java.io.BufferedReader;
 import java.io.IOException;

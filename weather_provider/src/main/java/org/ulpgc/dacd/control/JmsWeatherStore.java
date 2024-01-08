@@ -1,4 +1,4 @@
-package org.ulpc.dacd.control;
+package org.ulpgc.dacd.control;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -6,7 +6,7 @@ import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import org.apache.activemq.ActiveMQConnectionFactory;
-import org.ulpc.dacd.model.Weather;
+import org.ulpgc.dacd.model.Weather;
 
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;

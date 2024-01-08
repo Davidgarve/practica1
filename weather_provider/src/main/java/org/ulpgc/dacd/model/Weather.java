@@ -1,4 +1,4 @@
-package org.ulpc.dacd.model;
+package org.ulpgc.dacd.model;
 
 import java.time.Instant;
 
