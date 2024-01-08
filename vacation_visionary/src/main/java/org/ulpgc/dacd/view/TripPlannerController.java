@@ -70,7 +70,7 @@ public class TripPlannerController {
 
         predictionContent.add(new JLabel("Attention: This service only provides responses for a maximum range of 5 days after today"));
         gbc.gridy++;
-        predictionContent.add(new JLabel("Location"), gbc);
+        predictionContent.add(new JLabel("Date"), gbc);
 
         gbc.gridy++;
         predictionContent.add(predictionDatePicker, gbc);
