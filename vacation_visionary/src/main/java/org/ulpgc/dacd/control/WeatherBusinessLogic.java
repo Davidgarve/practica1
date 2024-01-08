@@ -3,7 +3,7 @@ package org.ulpgc.dacd.control;
 import java.time.LocalDate;
 import java.util.*;
 
-public class WeatherBusinessLogic {
+public class WeatherBusinessLogic implements WeatherBusinessLogicInterface{
 
     private final SQLiteEventStore eventStore;
 
@@ -49,7 +49,7 @@ public class WeatherBusinessLogic {
     public List<Map<String, Object>> getWeatherInfoInRange(String locationName, LocalDate startDate, LocalDate endDate) {
         List<Map<String, Object>> weatherInfoList = new ArrayList<>();
 
-        List<String> availableDates = SQLiteEventStore.getAvailableDatesInRange(startDate, endDate);
+        List<String> availableDates = eventStore.getAvailableDatesInRange(startDate, endDate);
 
         for (String date : availableDates) {
             Map<String, Object> weatherInfo = eventStore.getWeatherInfo(locationName, date);

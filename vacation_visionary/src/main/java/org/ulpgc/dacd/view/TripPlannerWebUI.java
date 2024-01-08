@@ -1,7 +1,5 @@
 package org.ulpgc.dacd.view;
 
-import org.ulpgc.dacd.control.SQLiteEventStore;
-
 import javax.swing.*;
 import java.awt.*;
 
@@ -9,16 +7,9 @@ public class TripPlannerWebUI extends JFrame {
 
     private final TripPlannerController tripPlannerController;
 
-    public TripPlannerWebUI() {
-        this.tripPlannerController = new TripPlannerController(new SQLiteEventStore());
+    public TripPlannerWebUI(TripPlannerController tripPlannerController) {
+        this.tripPlannerController = tripPlannerController;
         initComponents();
-    }
-
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            TripPlannerWebUI tripPlannerWebUI = new TripPlannerWebUI();
-            tripPlannerWebUI.setVisible(true);
-        });
     }
 
     private void initComponents() {

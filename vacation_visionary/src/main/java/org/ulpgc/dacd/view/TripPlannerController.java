@@ -3,33 +3,30 @@ package org.ulpgc.dacd.view;
 import org.jdatepicker.impl.JDatePanelImpl;
 import org.jdatepicker.impl.JDatePickerImpl;
 import org.jdatepicker.impl.UtilDateModel;
-import org.ulpgc.dacd.control.HotelBusinessLogic;
-import org.ulpgc.dacd.control.SQLiteEventStore;
-import org.ulpgc.dacd.control.WeatherBusinessLogic;
+import org.ulpgc.dacd.control.HotelBusinessLogicInterface;
+import org.ulpgc.dacd.control.WeatherBusinessLogicInterface;
 
 import javax.swing.*;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
+import javax.swing.text.html.HTMLDocument;
+import javax.swing.text.html.HTMLEditorKit;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.List;
-import javax.swing.text.html.HTMLDocument;
-import javax.swing.text.html.HTMLEditorKit;
 
 public class TripPlannerController {
 
-    private final WeatherBusinessLogic weatherBusinessLogic;
-    private final HotelBusinessLogic hotelBusinessLogic;
+    private final WeatherBusinessLogicInterface weatherBusinessLogic;
+    private final HotelBusinessLogicInterface hotelBusinessLogic;
 
-    public TripPlannerController(SQLiteEventStore eventStore) {
-        this.weatherBusinessLogic = new WeatherBusinessLogic(eventStore);
-        this.hotelBusinessLogic = new HotelBusinessLogic(eventStore);
+    public TripPlannerController(WeatherBusinessLogicInterface weatherBusinessLogic, HotelBusinessLogicInterface hotelBusinessLogic) {
+        this.weatherBusinessLogic = weatherBusinessLogic;
+        this.hotelBusinessLogic = hotelBusinessLogic;
     }
 
     public JPanel createPredictionTabContent() {
@@ -131,7 +128,6 @@ public class TripPlannerController {
             }
         });
 
-        // Changes in the layout of components
         recommendationContent.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -176,8 +172,6 @@ public class TripPlannerController {
         JDatePickerImpl checkInDatePicker = new JDatePickerImpl(checkInDatePanel, new DateLabelFormatter());
         JDatePickerImpl checkOutDatePicker = new JDatePickerImpl(checkOutDatePanel, new DateLabelFormatter());
         JButton getHotelsButton = createStyledButton("Get Available Hotels");
-
-        // Utilizar un JTextPane con formato HTML
         JTextPane hotelTextPane = createStyledHtmlTextPane();
 
         updateAvailableLocations(hotelLocationChoiceBox);
@@ -187,7 +181,6 @@ public class TripPlannerController {
             Object checkOutDateObject = checkOutDatePicker.getModel().getValue();
 
             if (checkInDateObject instanceof Date && checkOutDateObject instanceof Date) {
-                // Pasar el JTextPane al método handleGetHotelsButtonClick
                 handleGetHotelsButtonClick(
                         (String) hotelLocationChoiceBox.getSelectedItem(),
                         ((Date) checkInDateObject).toInstant().atZone(ZoneId.systemDefault()).toLocalDate(),
@@ -224,13 +217,12 @@ public class TripPlannerController {
         hotelContent.add(checkOutDatePicker, gbc);
 
         gbc.gridy++;
-        gbc.gridwidth = 2; // Ocupa dos columnas
+        gbc.gridwidth = 2;
         hotelContent.add(getHotelsButton, gbc);
 
         gbc.gridy++;
-        gbc.gridwidth = 1; // Revierte a ocupar una columna
+        gbc.gridwidth = 1;
 
-        // Utilizar JTextPane con formato HTML para mostrar el contenido de los hoteles
         gbc.gridy++;
         hotelContent.add(hotelTextPane, gbc);
 
@@ -248,32 +240,6 @@ public class TripPlannerController {
         textPane.setBackground(new Color(240, 240, 240));
         textPane.setBorder(BorderFactory.createLineBorder(Color.GRAY));
         return textPane;
-    }
-
-
-    public static class DateLabelFormatter extends JFormattedTextField.AbstractFormatter {
-
-        private String pattern = "yyyy-MM-dd";
-        private SimpleDateFormat dateFormatter = new SimpleDateFormat(pattern);
-
-        @Override
-        public Object stringToValue(String text) throws ParseException {
-            return dateFormatter.parseObject(text);
-        }
-
-        @Override
-        public String valueToString(Object value) {
-            if (value != null) {
-                if (value instanceof Date) {
-                    Calendar cal = Calendar.getInstance();
-                    cal.setTime((Date) value);
-                    return dateFormatter.format(cal.getTime());
-                } else if (value instanceof GregorianCalendar) {
-                    return dateFormatter.format(((GregorianCalendar) value).getTime());
-                }
-            }
-            return "";
-        }
     }
 
     private void updateAvailableLocations(JComboBox<String> locationChoiceBox) {

@@ -5,12 +5,12 @@ import javax.jms.MessageListener;
 import javax.jms.TextMessage;
 import java.util.concurrent.CompletableFuture;
 
-public class VacationVisionaryListener implements MessageListener {
+public class VacationVisionaryController implements MessageListener {
 
     private final SQLiteEventStore eventStore;
     private final String topic;
 
-    public VacationVisionaryListener(SQLiteEventStore eventStore, String topic) {
+    public VacationVisionaryController(SQLiteEventStore eventStore, String topic) {
         this.eventStore = eventStore;
         this.topic = topic;
     }
@@ -47,12 +47,10 @@ public class VacationVisionaryListener implements MessageListener {
         try {
             switch (topic) {
                 case "prediction.weather":
-                    eventStore.insertWeather(json);
+                    eventStore.saveWeather(json);
                     break;
                 case "hotel.rates":
-                    eventStore.insertHotel(json);
-                    eventStore.insertCheckInOut(json);
-                    eventStore.insertHotelRates(json);
+                    eventStore.saveHotel(json);
                     break;
                 default:
                     System.out.println("Unhandled topic: " + topic);

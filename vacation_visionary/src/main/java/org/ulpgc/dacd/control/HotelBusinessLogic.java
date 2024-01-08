@@ -4,7 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
-public class HotelBusinessLogic {
+public class HotelBusinessLogic implements HotelBusinessLogicInterface{
     private final SQLiteEventStore eventStore;
 
     public HotelBusinessLogic(SQLiteEventStore eventStore) {

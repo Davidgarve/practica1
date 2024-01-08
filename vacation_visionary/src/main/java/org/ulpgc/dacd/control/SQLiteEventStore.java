@@ -69,6 +69,30 @@ public class SQLiteEventStore implements EventStore{
         }
     }
 
+    public void saveHotel(String json) {
+        try {
+            Connection connection = getConnection();
+            insertHotel(json);
+            insertCheckInOut(json);
+            insertHotelRates(json);
+
+            connection.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void saveWeather(String json) {
+        try {
+            Connection connection = getConnection();
+            insertWeather(json);
+
+            connection.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void insertHotel(String json) {
         try (Connection connection = getConnection();
              PreparedStatement statement = connection.prepareStatement(
@@ -322,7 +346,7 @@ public class SQLiteEventStore implements EventStore{
         return availableDates;
     }
 
-    public static List<String> getAvailableDatesInRange(LocalDate startDate, LocalDate endDate) {
+    public List<String> getAvailableDatesInRange(LocalDate startDate, LocalDate endDate) {
         List<String> availableDates = new ArrayList<>();
 
         try (Connection connection = getConnection();
