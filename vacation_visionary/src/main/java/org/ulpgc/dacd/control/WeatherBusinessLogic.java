@@ -115,41 +115,32 @@ public class WeatherBusinessLogic implements WeatherBusinessLogicInterface{
         boolean lowWind = checkCondition(weatherStatusList, "wind", "low");
 
         if (highTemperature && lowPrecipitation) {
-            recommendation.append("I recommend visiting the selected destination as high temperatures and little precipitation are expected during most days of your stay.\n");
-        }
-
-        if (moderateTemperature && lowPrecipitation) {
+            recommendation.append("I recommend visiting the selected destination as high temperatures and low chances of precipitation are expected during most days of your stay.\n");
+        } else if (highTemperature && highPrecipitation) {
+            recommendation.append("I do not recommend visiting the selected destination since although high temperatures are expected, there is a high probability of precipitation during most days of your stay.\n");
+        } else if (moderateTemperature && lowPrecipitation) {
             recommendation.append("I recommend visiting the selected destination as moderate temperatures and low probability of precipitation are expected during most days of your stay.\n");
-        }
-
-        if (lowTemperature && lowPrecipitation) {
+        } else if (lowTemperature && highPrecipitation) {
+            recommendation.append("I do not recommend visiting the selected destination as low temperatures and high chances of precipitation are expected during most days of your stay.\n");
+        } else if (moderateTemperature && highPrecipitation) {
+            recommendation.append("I do not recommend visiting the selected destination as moderate temperatures and a high probability of precipitation are expected during most days of your stay.\n");
+        } else if (lowTemperature && lowPrecipitation) {
             recommendation.append("I do not recommend visiting the selected destination as low temperatures are expected, although no precipitation is expected during most days of your stay.\n");
         }
 
-        if (lowTemperature && highPrecipitation) {
-            recommendation.append("I do not recommend visiting the selected destination as low temperatures and heavy precipitation are expected during most days of your stay.\n");
-        }
-
-        if (lowClouds) {
-            recommendation.append("Additionally, most days of your stay are expected to have clear skies.\n");
-        }
-
-        if (moderateClouds){
-            recommendation.append("Additionally, most days of your stay are expected to have a moderate number of clouds.\n");
-        }
-
-        if (highClouds){
+        if (highClouds) {
             recommendation.append("Additionally, most days of your stay are expected to have a very cloudy sky.\n");
+        } else if (moderateClouds) {
+            recommendation.append("Additionally, most days of your stay are expected to have a moderate number of clouds.\n");
+        } else if (lowClouds) {
+            recommendation.append("Additionally, most days of your stay are expected to have clear skies.\n");
         }
 
         if (highWind){
             recommendation.append("Furthermore, strong wind gusts are expected.\n");
-        }
-
-        if (lowWind){
+        } else if (lowWind){
             recommendation.append("Furthermore, no strong wind gusts are expected.\n");
         }
-
         recommendation.append("If you want a more accurate weather prediction for a specific day, visit the 'Weather Forecast' tab.\n");
         return recommendation.toString();
     }
