@@ -12,8 +12,6 @@ import javax.swing.text.Document;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.*;
@@ -94,6 +92,12 @@ public class TripPlannerController {
         gbc.gridx = 1;
         predictionContent.add(predictionTextPane, gbc);
 
+        JButton refreshButton = createStyledButton("Refresh");
+        refreshButton.addActionListener(e -> handleRefreshButtonClick(predictionLocationChoiceBox));
+
+        gbc.gridy++;
+        predictionContent.add(refreshButton, gbc);
+
         return predictionContent;
     }
 
@@ -135,7 +139,7 @@ public class TripPlannerController {
         gbc.anchor = GridBagConstraints.NORTHWEST;
         recommendationContent.add(new JLabel("Attention: This service only provides responses for a maximum range of 5 days after today"));
         gbc.gridy++;
-        recommendationContent.add(new JLabel("Location"), gbc);
+        recommendationContent.add(new JLabel("Check-In Date"), gbc);
 
         gbc.gridy++;
         recommendationContent.add(checkInDatePicker, gbc);
@@ -157,6 +161,12 @@ public class TripPlannerController {
 
         gbc.gridy++;
         recommendationContent.add(recommendationTextPane, gbc);
+
+        JButton refreshButton = createStyledButton("Refresh");
+        refreshButton.addActionListener(e -> handleRefreshButtonClick(recommendationLocationChoiceBox));
+
+        gbc.gridy++;
+        recommendationContent.add(refreshButton, gbc);
 
         return recommendationContent;
     }
@@ -226,7 +236,39 @@ public class TripPlannerController {
         gbc.gridy++;
         hotelContent.add(hotelTextPane, gbc);
 
+        JButton refreshButton = createStyledButton("Refresh");
+        refreshButton.addActionListener(e -> handleRefreshButtonClick(hotelLocationChoiceBox));
+
+        gbc.gridy++;
+        hotelContent.add(refreshButton, gbc);
+
         return hotelContent;
+    }
+
+    private void handleRefreshButtonClick(JComboBox<String> locationChoiceBox) {
+        refreshLocations(locationChoiceBox);
+        refreshAllLocations(locationChoiceBox);
+    }
+
+    private void refreshLocations(JComboBox<String> locationChoiceBox) {
+        try {
+            List<String> availableLocations = hotelBusinessLogic.getAvailableHotelLocations();
+            SwingUtilities.invokeLater(() -> {
+                locationChoiceBox.removeAllItems();
+                for (String location : availableLocations) {
+                    locationChoiceBox.addItem(location);
+                }
+            });
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            showAlert("Error", "An error occurred while updating available locations. Please try again.");
+        }
+    }
+
+    private void refreshAllLocations(JComboBox<String> ChoiceBox) {
+        refreshLocations(ChoiceBox);
+        refreshLocations(ChoiceBox);
+        refreshLocations(ChoiceBox);
     }
 
     private JTextPane createStyledHtmlTextPane() {
