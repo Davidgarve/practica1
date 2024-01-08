@@ -51,7 +51,6 @@ public class XoteloSupplier implements HotelSupplier {
 
                     currentCheckOut = currentCheckOut.plusDays(1);
                 }
-
                 currentCheckIn = currentCheckIn.plusDays(1);
             }
 

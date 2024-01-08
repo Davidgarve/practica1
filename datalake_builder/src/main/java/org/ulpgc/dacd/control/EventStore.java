@@ -46,7 +46,7 @@ public class EventStore implements EventStoreBuilder {
                 writer.write(json);
             }
 
-            System.out.println("Evento almacenado en: " + eventFilePath);
+            System.out.println("Event stored in: " + eventFilePath);
         } catch (IOException e) {
             e.printStackTrace();
         }

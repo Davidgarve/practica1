@@ -4,7 +4,7 @@ package org.ulpgc.dacd.control;
 public class Main {
     public static void main(String[] args) {
         if (args.length < 1) {
-            System.out.println("Debe proporcionar la ruta base como argumento.");
+            System.out.println("You must provide the base path as an argument.");
             return;
         }
 

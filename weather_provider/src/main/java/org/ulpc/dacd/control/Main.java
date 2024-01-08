@@ -19,7 +19,6 @@ public class Main {
 
         String apiKey = args[0];
         String locationsFile = "locations.txt";
-
         List<Location> locations = readLocationsFromFile(locationsFile);
 
         String brokerURL = "tcp://localhost:61616";

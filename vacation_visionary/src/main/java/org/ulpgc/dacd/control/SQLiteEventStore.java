@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 public class SQLiteEventStore implements EventStore{
-    private static final String JDBC_URL = "jdbc:sqlite:datamark.db";
+    private static final String JDBC_URL = "jdbc:sqlite:datamart.db";
 
     static Connection getConnection() {
         try {

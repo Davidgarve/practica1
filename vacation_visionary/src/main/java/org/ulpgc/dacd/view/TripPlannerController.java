@@ -84,11 +84,11 @@ public class TripPlannerController {
         predictionContent.add(predictionLocationChoiceBox, gbc);
 
         gbc.gridy++;
-        gbc.gridwidth = 2; // Occupies two columns
+        gbc.gridwidth = 2;
         predictionContent.add(predictButton, gbc);
 
         gbc.gridy++;
-        gbc.gridwidth = 1; // Reverts to occupying one column
+        gbc.gridwidth = 1;
         predictionContent.add(new JLabel("Solution"), gbc);
 
         gbc.gridx = 1;
@@ -272,8 +272,6 @@ public class TripPlannerController {
             showAlert("Date Error", "Select valid check-in and check-out dates.");
             return;
         }
-
-        // Check if there is data available for at least one of the dates
         if (!weatherBusinessLogic.isDataAvailableForDates(checkInDate, checkOutDate)) {
             showAlert("Insufficient Data", "No data available for the selected date(s).");
             return;
@@ -300,11 +298,7 @@ public class TripPlannerController {
 
         try {
             List<Map<String, Object>> hotelData = hotelBusinessLogic.getHotelInfoForDates(selectedLocation, checkInDate, checkOutDate);
-
-            // Obtener contenido en formato HTML
             String htmlContent = buildHotelInfoHTML(hotelData);
-
-            // Insertar contenido HTML en el JTextPane
             setTextPaneContent(textPane, htmlContent);
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -323,7 +317,6 @@ public class TripPlannerController {
         if (hotelData.isEmpty()) {
             htmlContent.append("No data available for the selected location and dates.");
         } else {
-            // Utilizar una tabla HTML para organizar los hoteles en columnas
             htmlContent.append("<table border='1'><tr>");
 
             for (Map<String, Object> hotelInfo : hotelData) {
@@ -332,7 +325,7 @@ public class TripPlannerController {
                 String checkIn = hotelInfo.get("checkIn").toString();
                 String checkOut = hotelInfo.get("checkOut").toString();
 
-                htmlContent.append("<td width='200'>")  // Ancho ajustado a 200 píxeles, ajusta según tus necesidades
+                htmlContent.append("<td width='200'>")
                         .append("<b>").append(hotelName).append("</b>").append("<br>")
                         .append("Location: ").append(location).append("<br>")
                         .append("Check-In: ").append(checkIn).append("<br>")
@@ -369,11 +362,6 @@ public class TripPlannerController {
 
     private JButton createStyledButton(String text) {
         JButton button = new JButton(text);
-        button.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-            }
-        });
 
         button.setFont(new Font("Arial", Font.BOLD, 14));
         button.setBackground(new Color(52, 152, 219));

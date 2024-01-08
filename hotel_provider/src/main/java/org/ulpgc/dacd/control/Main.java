@@ -23,10 +23,10 @@ public class Main {
                     processHotelConfig(line);
                 }
             } catch (IOException e) {
-                System.err.println("Error al leer el archivo de configuración: " + e.getMessage());
+                System.err.println("Error reading configuration file: " + e.getMessage());
             }
         } else {
-            System.err.println("No se encontró el archivo " + CONFIG_FILE + " en resources.");
+            System.err.println("File not found " + CONFIG_FILE + " in resources.");
         }
     }
 
@@ -46,7 +46,7 @@ public class Main {
             HotelController hotelController = new HotelController(xoteloAPISupplier, jmsHotelStore, BROKER_URL, TOPIC_NAME);
             hotelController.execute(hotelName, checkIn, checkOut, location, Instant.now());
         } else {
-            System.err.println("Formato incorrecto en la línea de configuración: " + configLine);
+            System.err.println("Incorrect formatting on configuration line: " + configLine);
         }
     }
 }
