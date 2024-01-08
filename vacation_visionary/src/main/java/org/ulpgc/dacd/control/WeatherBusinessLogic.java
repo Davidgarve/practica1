@@ -103,31 +103,31 @@ public class WeatherBusinessLogic implements WeatherBusinessLogicInterface{
     public String generateWeatherRecommendation(List<Map<String, String>> weatherStatusList) {
         StringBuilder recommendation = new StringBuilder("Travel recommendation:\n");
 
-        boolean highTemperature = weatherStatusList.stream().allMatch(status -> "high".equals(status.get("temperature")));
-        boolean moderateTemperature = weatherStatusList.stream().allMatch(status -> "moderate".equals(status.get("temperature")));
-        boolean lowTemperature = weatherStatusList.stream().allMatch(status -> "low".equals(status.get("temperature")));
-        boolean lowPrecipitation = weatherStatusList.stream().allMatch(status -> "low".equals(status.get("precipitation")));
-        boolean highPrecipitation = weatherStatusList.stream().allMatch(status -> "high".equals(status.get("precipitation")));
-        boolean lowClouds = weatherStatusList.stream().allMatch(status -> "low".equals(status.get("clouds")));
-        boolean moderateClouds = weatherStatusList.stream().allMatch(status -> "moderate".equals(status.get("clouds")));
-        boolean highClouds = weatherStatusList.stream().allMatch(status -> "high".equals(status.get("clouds")));
-        boolean highWind = weatherStatusList.stream().allMatch(status -> "high".equals(status.get("wind")));
-        boolean lowWind = weatherStatusList.stream().allMatch(status -> "low".equals(status.get("wind")));
+        boolean highTemperature = checkCondition(weatherStatusList, "temperature", "high");
+        boolean moderateTemperature = checkCondition(weatherStatusList, "temperature", "moderate");
+        boolean lowTemperature = checkCondition(weatherStatusList, "temperature", "low");
+        boolean lowPrecipitation = checkCondition(weatherStatusList, "precipitation", "low");
+        boolean highPrecipitation = checkCondition(weatherStatusList, "precipitation", "high");
+        boolean lowClouds = checkCondition(weatherStatusList, "clouds", "low");
+        boolean moderateClouds = checkCondition(weatherStatusList, "clouds", "moderate");
+        boolean highClouds = checkCondition(weatherStatusList, "clouds", "high");
+        boolean highWind = checkCondition(weatherStatusList, "wind", "high");
+        boolean lowWind = checkCondition(weatherStatusList, "wind", "low");
 
         if (highTemperature && lowPrecipitation) {
-            recommendation.append("I recommend visiting the selected destination as high temperatures and low precipitation are expected during your stay.\n");
+            recommendation.append("I recommend visiting the selected destination as high temperatures and little precipitation are expected during most days of your stay.\n");
         }
 
         if (moderateTemperature && lowPrecipitation) {
-            recommendation.append("I recommend visiting the selected destination as moderate temperatures and low precipitation are expected during your stay.\n");
+            recommendation.append("I recommend visiting the selected destination as moderate temperatures and low probability of precipitation are expected during most days of your stay.\n");
         }
 
         if (lowTemperature && lowPrecipitation) {
-            recommendation.append("I do not recommend visiting the selected destination as low temperatures are expected, although no precipitation is expected.\n");
+            recommendation.append("I do not recommend visiting the selected destination as low temperatures are expected, although no precipitation is expected during most days of your stay.\n");
         }
 
         if (lowTemperature && highPrecipitation) {
-            recommendation.append("I do not recommend visiting the selected destination as low temperatures and heavy precipitation are expected.\n");
+            recommendation.append("I do not recommend visiting the selected destination as low temperatures and heavy precipitation are expected during most days of your stay.\n");
         }
 
         if (lowClouds) {
@@ -153,6 +153,13 @@ public class WeatherBusinessLogic implements WeatherBusinessLogicInterface{
         recommendation.append("If you want a more accurate weather prediction for a specific day, visit the 'Weather Forecast' tab.\n");
         return recommendation.toString();
     }
+
+    private boolean checkCondition(List<Map<String, String>> weatherStatusList, String property, String value) {
+        long count = weatherStatusList.stream()
+                .filter(status -> value.equals(status.get(property))).count();
+        return count > weatherStatusList.size() / 2;
+    }
+
 
     public boolean isDataAvailableForDates(LocalDate checkInDate, LocalDate checkOutDate) {
         if (checkInDate != null && checkOutDate != null) {
