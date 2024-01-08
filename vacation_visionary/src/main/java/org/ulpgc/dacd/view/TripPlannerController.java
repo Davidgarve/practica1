@@ -92,7 +92,7 @@ public class TripPlannerController {
         gbc.gridx = 1;
         predictionContent.add(predictionTextPane, gbc);
 
-        JButton refreshButton = createStyledButton("Refresh");
+        JButton refreshButton = createStyledButton("Refresh tab");
         refreshButton.addActionListener(e -> handleRefreshButtonClick(predictionLocationChoiceBox));
 
         gbc.gridy++;
@@ -162,7 +162,7 @@ public class TripPlannerController {
         gbc.gridy++;
         recommendationContent.add(recommendationTextPane, gbc);
 
-        JButton refreshButton = createStyledButton("Refresh");
+        JButton refreshButton = createStyledButton("Refresh tab");
         refreshButton.addActionListener(e -> handleRefreshButtonClick(recommendationLocationChoiceBox));
 
         gbc.gridy++;
@@ -236,7 +236,7 @@ public class TripPlannerController {
         gbc.gridy++;
         hotelContent.add(hotelTextPane, gbc);
 
-        JButton refreshButton = createStyledButton("Refresh");
+        JButton refreshButton = createStyledButton("Refresh tab");
         refreshButton.addActionListener(e -> handleRefreshButtonClick(hotelLocationChoiceBox));
 
         gbc.gridy++;
@@ -247,7 +247,6 @@ public class TripPlannerController {
 
     private void handleRefreshButtonClick(JComboBox<String> locationChoiceBox) {
         refreshLocations(locationChoiceBox);
-        refreshAllLocations(locationChoiceBox);
     }
 
     private void refreshLocations(JComboBox<String> locationChoiceBox) {
@@ -263,12 +262,6 @@ public class TripPlannerController {
             ex.printStackTrace();
             showAlert("Error", "An error occurred while updating available locations. Please try again.");
         }
-    }
-
-    private void refreshAllLocations(JComboBox<String> ChoiceBox) {
-        refreshLocations(ChoiceBox);
-        refreshLocations(ChoiceBox);
-        refreshLocations(ChoiceBox);
     }
 
     private JTextPane createStyledHtmlTextPane() {
