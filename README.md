@@ -1,6 +1,6 @@
-# Weather Forecast Application
+# Vacation Visionary Application
 
-- **Title:** Weather Forecast Application
+- **Title:** Vacation Visionary Application
 - **Subject:** Data science application development
 - **Course:** Second
 - **Academic Year:** 2023
@@ -9,12 +9,22 @@
 - **University:** Las Palmas de Gran Canaria University (ULPGC)
 
 ## Summary of Functionality
-This Java project is a comprehensive weather forecast application that seamlessly integrates two modules: Weather Provider and Weather Store. The Weather Provider module fetches weather data from the OpenWeatherMap API, processes it, and sends it to a message broker (Apache ActiveMQ). On the other hand, the Weather Store module subscribes to these weather events, stores them locally, and provides a mechanism to access historical weather data. The application operates in a periodic manner, updating weather data for specified locations every 6 hours.
+This Java project is an application whose objective is to make it easier for the user to make the decision of where they are going to spend their vacation that integrates four modules: Weather Provider, Hotel Provider, Datalake Builder and Vacation Visionary. The Weather Provider and Hotel provider modules obtain the necessary data from the OpenWeatherMap and Xotelo API, process it and send it to a message broker (Apache ActiveMQ). On the other hand, the Datalake Builder permanently subscribes to these events and stores them locally, providing a mechanism to access historical data. Finally, Vacation Visionary is responsible for receiving the messages by subscribing to the topics and stores them in a datamark. Then, this data is taken from the datamark and used in the business logic with which the user can interact through the graphical web interface. The application works periodically and the providers update the data every 6 hours.
 
 ## How to run .jar files
 1. First open a terminal and start the activemq execution.
-2. Then start the weather store execution in another terminal with this command: java -jar (address of the .jar).
-3. Finally, start the execution of the weather supplier in another terminal with this command: java -jar (address of the .jar) (your apiKey).
+2. Second open a terminal for each execution
+3. Then do the cd instructions in the folder where the .jar is in each terminal.
+4. You can run the Data Lake Builder whenever you want with this command: java -jar (name of the .jar).jar (introduce a basePath).
+5. Then start the vacation visionary execution with this command: java -jar (name of the .jar).jar
+6. Then start the hotel supplier execution in with this command: java -jar (name of the .jar).jar
+7. Finally, start the execution of the weather supplier with this command: java -jar (name of the .jar) (your apiKey).
+
+## Things to keep in mind
+-Ensure you have a valid API key for OpenWeatherMap. Obtain it here.
+-During the first execution the interface will take a while to receive the data, since there is no data in the datamart. When you know that the app has received a message (through the terminal), click on the buttons that appear in each tab called "refresh tab".
+-I recommend pressing the "refresh tab" button before querying the interface so that the data is as recent as possible.
+
 ## Project Structure
 The project's architecture is thoughtfully organized into well-defined packages, each serving a specific purpose:
 
@@ -102,15 +112,6 @@ The project strictly adheres to fundamental design principles, emphasizing modul
 
 ### Relationships and Dependencies
 The relationship between the two modules is established through the message broker (ActiveMQ), allowing seamless communication and data flow.
-
-## How to Use
-1. Open the `Main` class in the `org.ulpc.dacd.control` package of the Weather Provider module.
-2. Ensure you have a valid API key for OpenWeatherMap. Obtain it [here](#).
-3. Define the locations for which you want to retrieve weather data by creating `Location` objects.
-4. Open the `Main` class in the `org.ulpgc.dacd.control` package of the Weather Store module.
-5. Ensure that Apache ActiveMQ is running and configured with the `prediction.weather` topic.
-6. Run the `Main` class to initiate the message subscription process. The application will store weather events locally.
-7. Run the `Main` class to initiate the weather data retrieval process. The application will update the weather data for the specified locations every 6 hours. When you run main you must enter the apikey as an argument.
 
 ## Resources Used
 ### Libraries
