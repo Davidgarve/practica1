@@ -20,7 +20,7 @@ public class VacationVisionarySubscriber implements TopicSubscriber {
             MessageConsumer weatherConsumer = session.createConsumer(weatherTopic);
             MessageConsumer hotelRatesConsumer = session.createConsumer(hotelRateTopic);
 
-            SQLiteEventStore eventStore = new SQLiteEventStore();
+            SQLiteEventRepository eventStore = new SQLiteEventRepository();
 
             VacationVisionaryController weatherListener = new VacationVisionaryController(eventStore, "prediction.weather");
             VacationVisionaryController hotelRateListener = new VacationVisionaryController(eventStore, "hotel.rates");

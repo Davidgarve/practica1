@@ -7,10 +7,10 @@ import java.util.concurrent.CompletableFuture;
 
 public class VacationVisionaryController implements MessageListener {
 
-    private final SQLiteEventStore eventStore;
+    private final SQLiteEventRepository eventStore;
     private final String topic;
 
-    public VacationVisionaryController(SQLiteEventStore eventStore, String topic) {
+    public VacationVisionaryController(SQLiteEventRepository eventStore, String topic) {
         this.eventStore = eventStore;
         this.topic = topic;
     }
@@ -32,7 +32,7 @@ public class VacationVisionaryController implements MessageListener {
 
     private void processMessageAsync(String json) {
         CompletableFuture.runAsync(() -> {
-            synchronized (SQLiteEventStore.class) {
+            synchronized (SQLiteEventRepository.class) {
                 processMessage(json);
             }
         }).exceptionally(ex -> {

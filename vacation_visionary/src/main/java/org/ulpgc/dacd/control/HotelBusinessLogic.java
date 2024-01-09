@@ -5,9 +5,9 @@ import java.util.List;
 import java.util.Map;
 
 public class HotelBusinessLogic implements HotelBusinessLogicInterface{
-    private final SQLiteEventStore eventStore;
+    private final SQLiteEventRepository eventStore;
 
-    public HotelBusinessLogic(SQLiteEventStore eventStore) {
+    public HotelBusinessLogic(SQLiteEventRepository eventStore) {
         this.eventStore = eventStore;
     }
 

@@ -8,7 +8,7 @@ import javax.swing.*;
 
 public class Main {
     public static void main(String[] args) {
-        SQLiteEventStore eventStore = new SQLiteEventStore();
+        SQLiteEventRepository eventStore = new SQLiteEventRepository();
         eventStore.createTables();
 
         VacationVisionarySubscriber visionarySubscriber = new VacationVisionarySubscriber();

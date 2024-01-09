@@ -5,9 +5,9 @@ import java.util.*;
 
 public class WeatherBusinessLogic implements WeatherBusinessLogicInterface{
 
-    private final SQLiteEventStore eventStore;
+    private final SQLiteEventRepository eventStore;
 
-    public WeatherBusinessLogic(SQLiteEventStore eventStore) {
+    public WeatherBusinessLogic(SQLiteEventRepository eventStore) {
         this.eventStore = eventStore;
     }
 
