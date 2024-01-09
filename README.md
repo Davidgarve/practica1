@@ -107,11 +107,13 @@ The project strictly adheres to fundamental design principles, emphasizing modul
 - **Model-View-Controller (MVC):** The application structures follow MVC, an example is Vacation Visionary. The controller organizes the interactions between the model (business logic) and the view (user interface components).
 
 ### Class Diagram
-![Texto alternativo](weather_suplier.jpg)
-![Texto alternativo](weather_store.jpg)
+![Texto alternativo](weather_provider.jpg)
+![Texto alternativo](hotel_provider.jpg)
+![Texto alternativo](datalake_builder.jpg)
+![Texto alternativo](control_and_main.jpg)
+![Texto alternativo](view.jpg)
 
-### Relationships and Dependencies
-The relationship between the two modules is established through the message broker (ActiveMQ), allowing seamless communication and data flow.
+### Dependencies
 
 ## Resources Used
 ### Libraries
