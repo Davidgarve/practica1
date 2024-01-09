@@ -12,12 +12,14 @@ public class HotelController {
     private final JmsHotelStore jmsHotelStore;
     private final String brokerURL;
     private final String topicName;
+    private final long refreshFrequency;
 
-    public HotelController(XoteloSupplier xoteloAPISupplier, JmsHotelStore jmsHotelStore, String brokerURL, String topicName) {
+    public HotelController(XoteloSupplier xoteloAPISupplier, JmsHotelStore jmsHotelStore, String brokerURL, String topicName, long refreshFrequency) {
         this.xoteloAPISupplier = xoteloAPISupplier;
         this.jmsHotelStore = jmsHotelStore;
         this.brokerURL = brokerURL;
         this.topicName = topicName;
+        this.refreshFrequency = refreshFrequency;
     }
 
     public void execute(String hotelName, String checkInDate, String checkOutDate, String location, Instant ts) {
@@ -48,6 +50,6 @@ public class HotelController {
                 }
             }
         };
-        timer.scheduleAtFixedRate(task, 0, 6 * 60 * 60 * 1000);
+        timer.scheduleAtFixedRate(task, 0, refreshFrequency);
     }
 }

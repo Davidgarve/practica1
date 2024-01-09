@@ -8,12 +8,9 @@ import java.time.Instant;
 
 public class Main {
 
-    private static final String CONFIG_FILE = "hotels.txt";
-    private static final String BROKER_URL = "tcp://localhost:61616";
-    private static final String TOPIC_NAME = "hotel.rates";
-
     public static void main(String[] args) {
-        URL resource = Main.class.getClassLoader().getResource(CONFIG_FILE);
+        String hotelFile = "hotels.txt";
+        URL resource = Main.class.getClassLoader().getResource(hotelFile);
 
         if (resource != null) {
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(resource.openStream()))) {
@@ -26,7 +23,7 @@ public class Main {
                 System.err.println("Error reading configuration file: " + e.getMessage());
             }
         } else {
-            System.err.println("File not found " + CONFIG_FILE + " in resources.");
+            System.err.println("File not found " + hotelFile + " in resources.");
         }
     }
 
@@ -43,7 +40,10 @@ public class Main {
 
             XoteloSupplier xoteloAPISupplier = new XoteloSupplier(hotelKey);
             JmsHotelStore jmsHotelStore = new JmsHotelStore();
-            HotelController hotelController = new HotelController(xoteloAPISupplier, jmsHotelStore, BROKER_URL, TOPIC_NAME);
+            String brokerURL = "tcp://localhost:61616";
+            String topicName = "hotel.rates";
+            long refreshFrequency = 6 * 60 * 60 * 1000;
+            HotelController hotelController = new HotelController(xoteloAPISupplier, jmsHotelStore, brokerURL, topicName, refreshFrequency);
             hotelController.execute(hotelName, checkIn, checkOut, location, Instant.now());
         } else {
             System.err.println("Incorrect formatting on configuration line: " + configLine);

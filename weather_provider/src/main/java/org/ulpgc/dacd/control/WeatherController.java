@@ -13,12 +13,14 @@ public class WeatherController {
     private final JmsWeatherStore jmsWeatherStore;
     private final String brokerURL;
     private final String topicName;
+    private final long refreshFrequency;
 
-    public WeatherController(OpenWeatherMapSupplier openWeatherMapSupplier, JmsWeatherStore jmsWeatherStore, String brokerURL, String topicName) {
+    public WeatherController(OpenWeatherMapSupplier openWeatherMapSupplier, JmsWeatherStore jmsWeatherStore, String brokerURL, String topicName, long refreshFrequency) {
         this.openWeatherMapSupplier = openWeatherMapSupplier;
         this.jmsWeatherStore = jmsWeatherStore;
         this.brokerURL = brokerURL;
         this.topicName = topicName;
+        this.refreshFrequency = refreshFrequency;
     }
 
     public void execute(Location... locations) {
@@ -34,7 +36,7 @@ public class WeatherController {
                 }
             }
         };
-        timer.scheduleAtFixedRate(task, 0, 6 * 60 * 60 * 1000);
+        timer.scheduleAtFixedRate(task, 0, refreshFrequency);
     }
 
 }

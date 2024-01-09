@@ -26,7 +26,8 @@ public class Main {
 
         OpenWeatherMapSupplier supplier = new OpenWeatherMapSupplier(apiKey);
         JmsWeatherStore jmsWeatherStore = new JmsWeatherStore();
-        WeatherController weatherController = new WeatherController(supplier, jmsWeatherStore, brokerURL, topicName);
+        long refreshFrequency = 6 * 60 * 60 * 1000;
+        WeatherController weatherController = new WeatherController(supplier, jmsWeatherStore, brokerURL, topicName, refreshFrequency);
         weatherController.execute(locations.toArray(new Location[0]));
     }
 
