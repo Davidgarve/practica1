@@ -22,7 +22,7 @@ public class HotelController {
         this.refreshFrequency = refreshFrequency;
     }
 
-    public void execute(String hotelName, String location, Instant ts) {
+    public void execute(String hotelName, String location) {
         Timer timer = new Timer();
         TimerTask task = new TimerTask() {
             @Override
@@ -30,6 +30,7 @@ public class HotelController {
                 String checkIn = Instant.now().toString().substring(0, 10);
                 Instant checkOutInstant = Instant.now().plusMillis(5 * 24 * 60 * 60 * 1000);
                 String checkOut = checkOutInstant.toString().substring(0, 10);
+                Instant ts = Instant.now();
 
                 ZoneId utcZone = ZoneId.of("UTC");
                 Instant currentTime = Instant.now();

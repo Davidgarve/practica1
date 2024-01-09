@@ -40,7 +40,7 @@ public class Main {
             String topicName = "hotel.rates";
             long refreshFrequency = 6 * 60 * 60 * 1000;
             HotelController hotelController = new HotelController(xoteloAPISupplier, jmsHotelStore, brokerURL, topicName, refreshFrequency);
-            hotelController.execute(hotelName, location, Instant.now());
+            hotelController.execute(hotelName, location);
         } else {
             System.err.println("Incorrect formatting on configuration line: " + configLine);
         }
