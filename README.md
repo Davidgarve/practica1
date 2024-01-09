@@ -21,9 +21,9 @@ This Java project is an application whose objective is to make it easier for the
 7. Finally, start the execution of the weather supplier with this command: java -jar (name of the .jar) (your apiKey).
 
 ## Things to keep in mind
--Ensure you have a valid API key for OpenWeatherMap. Obtain it here.
--During the first execution the interface will take a while to receive the data, since there is no data in the datamart. When you know that the app has received a message (through the terminal), click on the buttons that appear in each tab called "refresh tab".
--I recommend pressing the "refresh tab" button before querying the interface so that the data is as recent as possible.
+1. Ensure you have a valid API key for OpenWeatherMap. Obtain it here.
+2. During the first execution the interface will take a while to receive the data, since there is no data in the datamart. When you know that the app has received a message (through the terminal), click on the buttons that appear in each tab called "refresh tab".
+3. I recommend pressing the "refresh tab" button before querying the interface so that the data is as recent as possible.
 
 ## Project Structure
 The project's architecture is thoughtfully organized into well-defined packages, each serving a specific purpose:
