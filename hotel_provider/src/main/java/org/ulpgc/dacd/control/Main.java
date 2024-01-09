@@ -34,17 +34,13 @@ public class Main {
             String location = hotelConfig[1].trim();
             String hotelKey = hotelConfig[2].trim();
 
-            String checkIn = Instant.now().toString().substring(0, 10);
-            Instant checkOutInstant = Instant.now().plusMillis(5 * 24 * 60 * 60 * 1000);
-            String checkOut = checkOutInstant.toString().substring(0, 10);
-
             XoteloSupplier xoteloAPISupplier = new XoteloSupplier(hotelKey);
             JmsHotelStore jmsHotelStore = new JmsHotelStore();
             String brokerURL = "tcp://localhost:61616";
             String topicName = "hotel.rates";
             long refreshFrequency = 6 * 60 * 60 * 1000;
             HotelController hotelController = new HotelController(xoteloAPISupplier, jmsHotelStore, brokerURL, topicName, refreshFrequency);
-            hotelController.execute(hotelName, checkIn, checkOut, location, Instant.now());
+            hotelController.execute(hotelName, location, Instant.now());
         } else {
             System.err.println("Incorrect formatting on configuration line: " + configLine);
         }

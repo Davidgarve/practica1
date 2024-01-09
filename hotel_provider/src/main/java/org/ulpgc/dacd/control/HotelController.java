@@ -22,11 +22,15 @@ public class HotelController {
         this.refreshFrequency = refreshFrequency;
     }
 
-    public void execute(String hotelName, String checkInDate, String checkOutDate, String location, Instant ts) {
+    public void execute(String hotelName, String location, Instant ts) {
         Timer timer = new Timer();
         TimerTask task = new TimerTask() {
             @Override
             public void run() {
+                String checkIn = Instant.now().toString().substring(0, 10);
+                Instant checkOutInstant = Instant.now().plusMillis(5 * 24 * 60 * 60 * 1000);
+                String checkOut = checkOutInstant.toString().substring(0, 10);
+
                 ZoneId utcZone = ZoneId.of("UTC");
                 Instant currentTime = Instant.now();
                 ZonedDateTime currentUtcTime = ZonedDateTime.ofInstant(currentTime, utcZone);
@@ -34,22 +38,18 @@ public class HotelController {
                 ZoneId canaryIslandsZone = ZoneId.of("Atlantic/Canary");
                 ZonedDateTime apiUpdateTime = ZonedDateTime.of(currentUtcTime.toLocalDateTime().toLocalDate(), LocalTime.of(17, 0), canaryIslandsZone);
 
-                if (currentUtcTime.isBefore(apiUpdateTime)) {
-                    List<Hotel> hotelList = xoteloAPISupplier.getHotel(hotelName, checkInDate, checkOutDate, location, ts);
-                    for (Hotel hotel : hotelList) {
-                        jmsHotelStore.sendHotelToBroker(hotel, brokerURL, topicName);
-                    }
-                } else {
-                    LocalDate nextDay = LocalDate.parse(checkInDate).plusDays(1);
-                    String nextDayString = nextDay.toString();
+                if (currentUtcTime.isAfter(apiUpdateTime)) {
+                    LocalDate nextDay = LocalDate.parse(checkIn).plusDays(1);
+                    checkIn = nextDay.toString();
+                }
 
-                    List<Hotel> hotelList = xoteloAPISupplier.getHotel(hotelName, nextDayString, checkOutDate, location, ts);
-                    for (Hotel hotel : hotelList) {
-                        jmsHotelStore.sendHotelToBroker(hotel, brokerURL, topicName);
-                    }
+                List<Hotel> hotelList = xoteloAPISupplier.getHotel(hotelName, checkIn, checkOut, location, ts);
+                for (Hotel hotel : hotelList) {
+                    jmsHotelStore.sendHotelToBroker(hotel, brokerURL, topicName);
                 }
             }
         };
         timer.scheduleAtFixedRate(task, 0, refreshFrequency);
     }
+
 }
