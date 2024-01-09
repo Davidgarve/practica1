@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class SQLiteEventRepository implements EventStore{
+public class SQLiteEventRepository implements EventRepository {
     private static final String JDBC_URL = "jdbc:sqlite:datamart.db";
 
     static Connection getConnection() {
