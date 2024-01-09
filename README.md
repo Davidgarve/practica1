@@ -102,7 +102,7 @@ The project strictly adheres to fundamental design principles, emphasizing modul
 
 ### Design Principles and Patterns
 - **Command Pattern:** The event handling in the UI, where actions (button clicks) trigger specific commands (e.g., handlePredictionButtonClick, handleRecommendationButtonClick), reflects a command-like pattern.
-- **Observer Pattern:** The TopicSubscriber interface and the start method suggest the implementation of the Observer pattern. Subscribers can register and receive updates or events.
+- **Observer Pattern:** The TopicSubscriber interface and the start method suggest the implementation of the Observer pattern. Subscribers can register and receive events.
 - **Single Responsibility Principle (SRP):** Classes  have a single responsibility, such as the WeatherBusinessLogic and HotelBusinessLogic, which handle weather and hotel-related business logic, respectively.
 - **Model-View-Controller (MVC):** The application structures follow MVC, an example is Vacation Visionary. The controller organizes the interactions between the model (business logic) and the view (user interface components).
 
