@@ -22,7 +22,7 @@ This Java project is an application whose objective is to make it easier for the
 
 ## Things to keep in mind
 1. Ensure you have a valid API key for OpenWeatherMap. Obtain it here.
-2. During the first execution the interface will take a while to receive the data, since there is no data in the datamart. During this period, the location dropdown menus will appear empty. Therefore, when you know that the app has received the first hotel events (via the terminal), click on the buttons that appear in each tab called "refresh tab" and the drop-down menus will be filled with the locations.
+2. During the first execution the interface will take a while to receive the data, since there is no data in the datamart. During this period, the location dropdown menus will appear empty. Therefore, when you know that the app has received the first events from the hotel (via the terminal), click on the buttons that appear in each tab called "update tab" and the drop-down menus will be filled with the locations. `It is very important not to click on the "Predict conditions", "Get recommendations" and "Get available hotels" buttons without the first hotel events having arrived and click the "Refresh tab" button:`.
 3. I recommend pressing the "refresh tab" button before querying the interface so that the data is as recent as possible.
 
 ## Project Structure
